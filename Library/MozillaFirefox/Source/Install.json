@@ -1,0 +1,16 @@
+{
+  "PackageInformation": {
+    "SetupType": "MSI",
+    "SetupFile": "Firefox Setup 127.0.2.msi",
+    "Version": "127.0.2"
+  },
+  "LogPath": "C:\\ProgramData\\Microsoft\\IntuneManagementExtension\\Logs",
+  "InstallTasks": {
+    "StopProcess": [],
+    "ArgumentList": "/package \"#SetupFile\" DESKTOP_SHORTCUT=false TASKBAR_SHORTCUT=false /quiet /log \"#LogPath\\#LogName.log\""
+  },
+  "PostInstall": {
+    "Remove": [],
+    "CopyFile": []
+  }
+}

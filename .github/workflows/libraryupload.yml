@@ -1,0 +1,45 @@
+name: 'Library upload'
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-package:
+    runs-on: windows-latest
+
+    steps:
+        - uses: actions/checkout@v4
+
+        - name: Install and cache PowerShell modules
+          id: psmodulecache
+          uses: potatoqualitee/psmodulecache@v6.2
+          with:
+            modules-to-cache: "Evergreen::, VcRedist::"
+            updatable: true
+            shell: pwsh
+
+        - name: Import library
+          id: import-library
+          shell: pwsh
+          working-directory: ${{ github.workspace }}
+          env:
+            CLIENT_ID: ${{ secrets.CLIENT_ID }}
+            CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+            OKTA_STUB: ${{ secrets.OKTA_STUB }}
+          run: |
+            Import-Module -Name "Evergreen", "VcRedist" -Force
+            New-Item -Path "${{ github.workspace }}\working" -ItemType Directory -Force
+
+            # Authenticate to the Graph API; expects secrets to be passed into environment variables
+            $params = @{
+                ClientId     = "$env:CLIENT_ID"
+                ClientSecret = "$env:CLIENT_SECRET"
+                OktaStub     = "$env:OKTA_STUB"
+                Library      = "${{ github.workspace }}\Library"
+                Path         = "${{ github.workspace }}\working"
+                ErrorAction  = "Stop"
+            }
+            & "${{ github.workspace }}\Start-PackageLibraryUpload.ps1" @params

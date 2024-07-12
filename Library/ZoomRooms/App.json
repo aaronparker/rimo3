@@ -1,0 +1,53 @@
+{
+  "Application": {
+    "Name": "Zoom Rooms",
+    "Filter": "Get-EvergreenAppFromApi -Name \"Zoom\" | Where-Object { $_.Platform -eq \"Rooms\" -and $_.Type -eq \"msi\" -and $_.Architecture -eq \"x64\" } | Select-Object -First 1",
+    "Title": "Zoom Meetings Client",
+    "Language": "en-US",
+    "Architecture": "x64"
+  },
+  "PackageInformation": {
+    "SetupType": "MSI",
+    "SetupFile": "zoomrooms-6.0.7.4157-x64.msi",
+    "Version": "6.0.7.4157",
+    "SourceFolder": "Source",
+    "OutputFolder": "Package",
+    "IconFile": "https://github.com/aaronparker/icons/raw/main/companyportal/ZoomRooms.png"
+  },
+  "Information": {
+    "DisplayName": "Zoom Meetings Client 6.0.7.4157 x64",
+    "Description": "Conference rooms that make it easy to run or join video meetings with a tap of a button.",
+    "Publisher": "Zoom",
+    "InformationURL": "https://explore.zoom.us/en/products/zoom-rooms/",
+    "PrivacyURL": "https://explore.zoom.us/privacy",
+    "Categories": [],
+    "PSPackageFactoryGuid": "a918abe7-620c-438f-b9ee-000383ad5f9e"
+  },
+  "Program": {
+    "InstallTemplate": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "InstallCommand": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "UninstallCommand": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Uninstall.ps1",
+    "InstallExperience": "system",
+    "DeviceRestartBehavior": "suppress",
+    "AllowAvailableUninstall": false
+  },
+  "RequirementRule": {
+    "MinimumRequiredOperatingSystem": "W10_1809",
+    "Architecture": "x64"
+  },
+  "CustomRequirementRule": [],
+  "DetectionRule": [
+    {
+      "Type": "File",
+      "DetectionMethod": "Version",
+      "Path": "C:\\Program Files\\ZoomRooms\\bin",
+      "FileOrFolder": "ZoomRooms.exe",
+      "Operator": "greaterThanOrEqual",
+      "VersionValue": "6.0.7.4157",
+      "Check32BitOn64System": "false"
+    }
+  ],
+  "Dependencies": [],
+  "Supersedence": [],
+  "Assignments": []
+}

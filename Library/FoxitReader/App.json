@@ -1,0 +1,53 @@
+{
+  "Application": {
+    "Name": "FoxitReader",
+    "Filter": "Get-EvergreenAppFromApi -Name \"FoxitReader\" | Where-Object { $_.Language -eq \"English\" } | Select-Object -First 1",
+    "Title": "Foxit PDF Reader",
+    "Language": "en-US",
+    "Architecture": "x86"
+  },
+  "PackageInformation": {
+    "SetupType": "MSI",
+    "SetupFile": "FoxitPDFReader202422_enu_Setup.msi",
+    "Version": "2024.2.2.25170",
+    "SourceFolder": "Source",
+    "OutputFolder": "Package",
+    "IconFile": "https://github.com/aaronparker/icons/raw/main/companyportal/FoxitReader.png"
+  },
+  "Information": {
+    "DisplayName": "Foxit PDF Reader 2024.2.2.25170",
+    "Description": "View, annotate, form fill, and sign PDF across desktop, mobile, and web - no matter if you're at the office, home, or on the go.",
+    "Publisher": "Foxit Software Inc.",
+    "InformationURL": "https://www.foxit.com/pdf-reader/",
+    "PrivacyURL": "https://www.foxit.com/company/privacy-policy.html",
+    "Categories": [],
+    "PSPackageFactoryGuid": "f0c70a2c-6616-4ec3-a203-895e0f15d18a"
+  },
+  "Program": {
+    "InstallTemplate": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "InstallCommand": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "UninstallCommand": "MsiExec.exe /X \"{F398C64A-E282-11EC-8A9F-54BF64A63C26}\" /quiet",
+    "InstallExperience": "system",
+    "DeviceRestartBehavior": "suppress",
+    "AllowAvailableUninstall": false
+  },
+  "RequirementRule": {
+    "MinimumRequiredOperatingSystem": "W10_1809",
+    "Architecture": "All"
+  },
+  "CustomRequirementRule": [],
+  "DetectionRule": [
+    {
+      "Type": "File",
+      "DetectionMethod": "Version",
+      "Path": "C:\\Program Files (x86)\\Foxit Software\\Foxit PDF Reader",
+      "FileOrFolder": "FoxitPDFReader.exe",
+      "Operator": "greaterThanOrEqual",
+      "VersionValue": "2024.2.2.25170",
+      "Check32BitOn64System": "true"
+    }
+  ],
+  "Dependencies": [],
+  "Supersedence": [],
+  "Assignments": []
+}
