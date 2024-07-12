@@ -89,7 +89,7 @@ process {
         }
         Write-Host "Application id: $($AppStatus.applicationPackageId)"
 
-        if ($null -ne $AppStatus.applicationPackageId) {
+        if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
             $params = @{
                 Uri             = "$RimoPackagesUri/$($AppStatus.applicationPackageId)/sequences"
                 Headers         = @{

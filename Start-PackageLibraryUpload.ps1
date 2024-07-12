@@ -105,7 +105,7 @@ process {
         }
 
         # If the app doesn't exist, then let's import it
-        if ($null -eq $AppStatus) {
+        if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
             $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath $WorkingDir -ErrorAction "Stop"
             Write-Host "Saved file: $($OutFile.FullName)"
 
