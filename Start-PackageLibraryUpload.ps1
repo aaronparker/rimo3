@@ -96,13 +96,8 @@ process {
         $EvergreenApp = Invoke-Expression -Command $AppJson.Application.Filter
         $EvergreenApp | Format-List
 
-        # Match app to status
-        if ($null -eq $EvergreenApp.Filename) {
-            $AppStatus = $Status | Where-Object { [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and $_.fileName -eq $(Split-Path -Path $EvergreenApp.Uri -Leaf) }
-        }
-        else {
-            $AppStatus = $Status | Where-Object { [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and $_.fileName -eq $EvergreenApp.Filename }
-        }
+        # See if the app has already been imported
+        $AppStatus = $Status | Where-Object { [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and $_.fileName -eq $AppJson.PackageInformation.SetupFile }
 
         # If the app doesn't exist, then let's import it
         if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
@@ -200,13 +195,13 @@ process {
                             "file"              = (Get-Item -Path $ZipFile.FullName)
                             "displayName"      = $AppJson.Information.DisplayName
                             "comment"          = "Imported by Evergreen"
-                            "fileName"          = "$(Split-Path -Path $EvergreenApp.URI -Leaf)"
+                            "fileName"          = $AppJson.PackageInformation.SetupFile # (if ($EvergreenApp.FileName.Length -gt 0) { $EvergreenApp.FileName } else { $(Split-Path -Path $EvergreenApp.URI -Leaf) })
                             "publisher"        = $AppJson.Information.Publisher
                             "name"             = $AppJson.Application.Title
                             "version"          = $EvergreenApp.Version
                             "installCommand"   = $AppJson.Program.InstallCommand
                             "uninstallCommand" = $AppJson.Program.UninstallCommand
-                            "tags"             = "Evergreen"
+                            "tags"             = @("Evergreen", $AppJson.Information.Publisher)
                             "progressStep"     = "2"
                         }
                         ContentType     = "multipart/form-data"

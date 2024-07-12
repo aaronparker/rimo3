@@ -8,7 +8,7 @@ Add the required secrets to the repository:
 
 * `CLIENT_ID` - Okta client ID
 * `CLIENT_SECRET` - secret value to authenticate with the client ID
-* `OKTA_STUB` - the stub value used in the Okta authentication URL, e.g. `https://rimo3.okta.com/oauth2/ **aus44lpmxba6Mxq8M4z7** /v1/token`
+* `OKTA_STUB` - the stub value used in the Okta authentication URL, e.g. `aus44lpmxba6Mxq8M4z7`
 
 ![.img/repo-secrets.jpeg](.img/repo-secrets.jpeg)
 
