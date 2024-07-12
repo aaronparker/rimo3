@@ -2,14 +2,18 @@
 
 Evergreen and Rimo3 Cloud integration proof-of-concept.
 
-## Import packages
+## Update Secrets
 
-Packages can be uploaded via the `Package upload` workflow:
+Add the required secrets to the repository:
 
-![.img/package-upload.jpeg](.img/package-upload.jpeg)
+* `CLIENT_ID` - Okta client ID
+* `CLIENT_SECRET` - secret value to authenticate with the client ID
+* `OKTA_STUB` - the stub value used in the Okta authentication URL, e.g. https://rimo3.okta.com/oauth2/**aus44lpmxba6Mxq8M4z7**/v1/token
 
-## View package status
+![.img/repo-secrets.jpeg](.img/repo-secrets.jpeg)
 
-Package status from Rimo3 Cloud can be output via the `Package status` workflow:
+## Run workflow
+
+The GitHub Actions workflow can be starts on the Actions tab. This will import the packages defined in the `Library` directory.
 
 ![.img/package-status.jpeg](.img/package-status.jpeg)
