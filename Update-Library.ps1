@@ -17,6 +17,7 @@ foreach ($Folder in $Packages.Name) {
         Path        = "$Source/$Folder/*"
         Destination = "$Library/$Folder"
         Recurse     = $true
+        Force       = $true
         ErrorAction = "Stop"
     }
     Copy-Item @params
