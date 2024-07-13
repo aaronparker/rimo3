@@ -1,11 +1,47 @@
+<#
+    .SYNOPSIS
+    Uploads application packages to Rimo3 Cloud.
+
+    .DESCRIPTION
+    This script uploads application packages to Rimo3, a cloud-based application management platform. It requires the "Evergreen" module to be installed.
+
+    .PARAMETER Library
+    The path to the library directory containing the application packages. Default value is ".\Library".
+
+    .PARAMETER ClientId
+    The client ID for authenticating to the Okta API.
+
+    .PARAMETER ClientSecret
+    The client secret for authenticating to the Okta API.
+
+    .PARAMETER OktaStub
+    The Okta stub for the Okta API URL. Default value is "aus1q1z5zv8Z6Z6QX2p7".
+
+    .PARAMETER Path
+    The path where the application packages will be saved.
+
+    .EXAMPLE
+    Start-PackageLibraryUpload.ps1 -Library "C:\Applications" -ClientId "12345678" -ClientSecret "abcdefg" -Path "C:\Uploads"
+    Uploads application packages from the "C:\Applications" directory to Rimo3 using the specified Okta credentials and saves them to the "C:\Uploads" directory.
+
+    .NOTES
+    - This script requires PowerShell version 5.1 or later.
+    - The "Evergreen" module must be installed before running this script.
+    - Ensure that the Okta credentials provided have the necessary permissions to access the Okta API.
+    - The script will authenticate to the Okta API and retrieve an access token before uploading the application packages.
+    - The script will check the status of the application sequences in Rimo3 before uploading the packages.
+    - The script will process each directory in the library and upload the corresponding application package to Rimo3.
+    - The script supports both MSI/MSIX and EXE installers.
+    - For MSI/MSIX installers, the script will compress the downloaded installer and upload it to Rimo3.
+    - For EXE installers, the script will compress the downloaded installer and supporting files (Install.json and Install.ps1) and upload them to Rimo3.
+    - The script will use the Evergreen module to download the application packages based on the filter specified in the App.json file.
+    - If an application package with the same version and setup file name already exists in Rimo3, it will not be re-uploaded.
+    - The script will display the progress and status of the upload process.
+#>
 #requires -Version 5.1
 #requires -Modules "Evergreen"
-<#
-    Download a specified application via Evergreen and import into Rimo3
-#>
-[CmdletBinding(SupportsShouldProcess = $true)]
+[CmdletBinding(SupportsShouldProcess = $false)]
 param (
-
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [System.String] $Library = ".\Library",
@@ -18,9 +54,9 @@ param (
     [ValidateNotNullOrEmpty()]
     [System.String] $ClientSecret,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [System.String] $OktaStub = "aus1q1z5zv8Z6Z6QX2p7",
+    [System.String] $OktaStub,
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
@@ -211,8 +247,8 @@ process {
                     if ($Result.IsSuccessStatusCode -eq $false) {
                         Write-Error -Message $Result.ReasonPhrase
                     }
+                    #endregion
                 }
-                #endregion
             }
             else {
                 Write-Error -Message "File not found: $($OutFile.FullName)"
