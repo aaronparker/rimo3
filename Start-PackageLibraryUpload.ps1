@@ -133,12 +133,20 @@ process {
         # If the app doesn't exist, then let's import it
         if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
             Write-Host "Importing: $($AppJson.Application.Title) $($EvergreenApp.Version)"
+            
             $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath $WorkingDir -ErrorAction "Stop"
             Write-Host "Saved file: $($OutFile.FullName)"
 
             if (Test-Path -Path $OutFile.FullName) {
+
+                if ($OutFile.FullName -match "\.zip") {
+                    # Extract the downloaded installer
+                    Expand-Archive -Path $OutFile.FullName -Destination $WorkingDir -Force
+                    Remove-Item -Path $OutFile.FullName -Force
+                }
+
                 #region MSI
-                if ($OutFile.FullName -match "\.msi$|\.msix$") {
+                if ($AppJson.PackageInformation.SetupFile -match "\.msi$|\.msix$") {
 
                     # Compress the downloaded installer
                     $params = @{
@@ -264,7 +272,6 @@ process {
         }
         else {
             Write-Host "Application already exists in Rimo3: $($AppJson.Application.Title) $($EvergreenApp.Version)"
-            Write-Host ""
         }
 
         # Remove the variable for the next app
