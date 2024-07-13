@@ -126,13 +126,13 @@ process {
 
         # Download the application with Evergreen
         $EvergreenApp = Invoke-Expression -Command $AppJson.Application.Filter
-        $EvergreenApp | Format-List
 
         # See if the app has already been imported
         $AppStatus = $Status | Where-Object { [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and $_.fileName -eq $AppJson.PackageInformation.SetupFile }
 
         # If the app doesn't exist, then let's import it
         if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
+            Write-Host "Importing: $($AppJson.Application.Title) $($EvergreenApp.Version)"
             $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath $WorkingDir -ErrorAction "Stop"
             Write-Host "Saved file: $($OutFile.FullName)"
 
