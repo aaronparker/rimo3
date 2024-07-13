@@ -125,10 +125,6 @@ process {
         Write-Host "Working directory: $WorkingDir"
 
         # Download the application with Evergreen
-        # $WhereBlock = [ScriptBlock]::Create($AppJson.Application.Filter)
-        # $EvergreenApp = Get-EvergreenApp -Name $AppJson.Application.Name | `
-        #     Where-Object $WhereBlock | `
-        #     Select-Object -First 1
         $EvergreenApp = Invoke-Expression -Command $AppJson.Application.Filter
         $EvergreenApp | Format-List
 
@@ -178,6 +174,12 @@ process {
                         else {
                             Copy-Item -Path "$Library\Install.ps1" -Destination "$WorkingDir\Install.ps1"
                         }
+
+                        # Read the install.json file
+                        $Install = Get-Content -Path "$($App.FullName)\Install.json" | ConvertFrom-Json
+                        $ArgumentList = $Install.InstallTasks.ArgumentList -replace "#SetupFile", $AppJson.PackageInformation.SetupFile
+                        $ArgumentList = $ArgumentList -replace "#LogName", $AppJson.PackageInformation.SetupFile
+                        $ArgumentList = $ArgumentList -replace "#LogPath", "$Env:SystemRoot\Logs"
                     }
 
                     # Compress the downloaded installers and supporting files
@@ -228,15 +230,16 @@ process {
                             "Authorization" = "Bearer $($Token.access_token)"
                         }
                         Form            = @{
-                            "file"              = (Get-Item -Path $ZipFile.FullName)
+                            "file"             = (Get-Item -Path $ZipFile.FullName)
                             "displayName"      = $AppJson.Information.DisplayName
                             "comment"          = "Imported by Evergreen"
-                            "fileName"          = $AppJson.PackageInformation.SetupFile # (if ($EvergreenApp.FileName.Length -gt 0) { $EvergreenApp.FileName } else { $(Split-Path -Path $EvergreenApp.URI -Leaf) })
+                            "fileName"         = $AppJson.PackageInformation.SetupFile # (if ($EvergreenApp.FileName.Length -gt 0) { $EvergreenApp.FileName } else { $(Split-Path -Path $EvergreenApp.URI -Leaf) })
                             "publisher"        = $AppJson.Information.Publisher
                             "name"             = $AppJson.Application.Title
                             "version"          = $EvergreenApp.Version
-                            "installCommand"   = $AppJson.Program.InstallCommand
-                            "uninstallCommand" = $AppJson.Program.UninstallCommand
+                            "installCommand"   = "$($AppJson.PackageInformation.SetupFile) $ArgumentList"
+                            #"installCommand"   = $AppJson.Program.InstallCommand
+                            #"uninstallCommand" = $AppJson.Program.UninstallCommand
                             "tags"             = @("Evergreen", $AppJson.Information.Publisher)
                             "progressStep"     = "2"
                         }
