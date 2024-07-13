@@ -1,0 +1,53 @@
+{
+  "Application": {
+    "Name": "Cyberduck",
+    "Filter": "Get-EvergreenAppFromApi -Name \"Cyberduck\"",
+    "Title": "Cyberduck",
+    "Language": "en-US",
+    "Architecture": "x64"
+  },
+  "PackageInformation": {
+    "SetupType": "EXE",
+    "SetupFile": "Cyberduck-Installer-9.0.0.41777.exe",
+    "Version": "9.0.0.41777",
+    "SourceFolder": "Source",
+    "OutputFolder": "Package",
+    "IconFile": "https://github.com/aaronparker/icons/raw/main/companyportal/Iterate-Cyberduck1.png"
+  },
+  "Information": {
+    "DisplayName": "Cyberduck 9.0.0.41777",
+    "Description": "Cyberduck is a libre server and cloud storage browser for Mac and Windows with support for FTP, SFTP, WebDAV, Amazon S3, OpenStack Swift, Backblaze B2, Microsoft Azure & OneDrive, Google Drive and Dropbox.",
+    "Publisher": "iterate",
+    "InformationURL": "https://cyberduck.io/",
+    "PrivacyURL": "https://cyberduck.io/privacy",
+    "Categories": [],
+    "PSPackageFactoryGuid": "d270031c-f5c9-4e20-9d78-f475e28ac22c"
+  },
+  "Program": {
+    "InstallTemplate": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "InstallCommand": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "UninstallCommand": "msiexec.exe /X \"{8FF1F756-1F7C-41C1-880E-B03218DFDD72}\" /quiet",
+    "InstallExperience": "system",
+    "DeviceRestartBehavior": "suppress",
+    "AllowAvailableUninstall": false
+  },
+  "RequirementRule": {
+    "MinimumRequiredOperatingSystem": "W10_1809",
+    "Architecture": "x64"
+  },
+  "CustomRequirementRule": [],
+  "DetectionRule": [
+    {
+      "Type": "File",
+      "DetectionMethod": "Version",
+      "Path": "C:\\Program Files\\Cyberduck",
+      "FileOrFolder": "Cyberduck.exe",
+      "Operator": "greaterThanOrEqual",
+      "VersionValue": "9.0.0.41777",
+      "Check32BitOn64System": "false"
+    }
+  ],
+  "Dependencies": [],
+  "Supersedence": [],
+  "Assignments": []
+}
