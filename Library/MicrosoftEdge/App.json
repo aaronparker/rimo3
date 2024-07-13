@@ -9,13 +9,13 @@
   "PackageInformation": {
     "SetupType": "MSI",
     "SetupFile": "MicrosoftEdgeEnterpriseX64.msi",
-    "Version": "126.0.2592.81",
+    "Version": "126.0.2592.87",
     "SourceFolder": "Source",
     "OutputFolder": "Package",
     "IconFile": "https://github.com/aaronparker/icons/raw/main/companyportal/Microsoft-Edge.png"
   },
   "Information": {
-    "DisplayName": "Microsoft Edge 126.0.2592.81 x64",
+    "DisplayName": "Microsoft Edge 126.0.2592.87 x64",
     "Description": "Microsoft Edge is the fast and secure browser that helps you protect your data and save time and money.",
     "Publisher": "Microsoft",
     "InformationURL": "https://www.microsoft.com/en-us/edge/features",
@@ -24,9 +24,9 @@
     "PSPackageFactoryGuid": "8d6b09d2-466b-4430-a102-9ea9cfb6ddbc"
   },
   "Program": {
-    "InstallTemplate": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
-    "InstallCommand": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
-    "UninstallCommand": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Uninstall.ps1",
+    "InstallTemplate": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "InstallCommand": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "UninstallCommand": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Uninstall.ps1",
     "InstallExperience": "system",
     "DeviceRestartBehavior": "basedOnReturnCode",
     "AllowAvailableUninstall": false
@@ -43,7 +43,7 @@
       "Path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application",
       "FileOrFolder": "msedge.exe",
       "Operator": "greaterThanOrEqual",
-      "VersionValue": "126.0.2592.81",
+      "VersionValue": "126.0.2592.87",
       "Check32BitOn64System": "false"
     }
   ],

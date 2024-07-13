@@ -8,14 +8,14 @@
   },
   "PackageInformation": {
     "SetupType": "EXE",
-    "SetupFile": "PowerToysSetup-0.81.1-x64.exe",
-    "Version": "0.81.1",
+    "SetupFile": "PowerToysSetup-0.82.0-x64.exe",
+    "Version": "0.82.0",
     "SourceFolder": "Source",
     "OutputFolder": "Package",
     "IconFile": "https://github.com/microsoft/PowerToys/raw/v0.58.0/installer/MSIX/Images/logo.png"
   },
   "Information": {
-    "DisplayName": "Microsoft PowerToys 0.81.1 x64",
+    "DisplayName": "Microsoft PowerToys 0.82.0 x64",
     "Description": "Microsoft PowerToys is a set of utilities for power users to tune and streamline their Windows experience for greater productivity.",
     "Publisher": "Microsoft",
     "InformationURL": "https://aka.ms/powertoys-docs",
@@ -24,9 +24,9 @@
     "PSPackageFactoryGuid": "3c006ea7-a6e8-4ef4-8364-c93bd9bedb99"
   },
   "Program": {
-    "InstallTemplate": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
-    "InstallCommand": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
-    "UninstallCommand": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Uninstall.ps1",
+    "InstallTemplate": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "InstallCommand": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "UninstallCommand": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Uninstall.ps1",
     "InstallExperience": "system",
     "DeviceRestartBehavior": "suppress",
     "AllowAvailableUninstall": false
@@ -43,7 +43,7 @@
       "Path": "C:\\Program Files\\PowerToys",
       "FileOrFolder": "PowerToys.exe",
       "Operator": "greaterThanOrEqual",
-      "VersionValue": "0.81.1",
+      "VersionValue": "0.82.0",
       "Check32BitOn64System": "false"
     }
   ],

@@ -24,8 +24,8 @@
     "PSPackageFactoryGuid": "b683123c-aceb-45b3-b331-2f131d521df6"
   },
   "Program": {
-    "InstallTemplate": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
-    "InstallCommand": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "InstallTemplate": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "InstallCommand": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
     "UninstallCommand": "\"C:\\ProgramData\\Package Cache\\{5af95fd8-a22e-458f-acee-c61bd787178e}\\VC_redist.x64.exe\" /uninstall /quiet /norestart",
     "InstallExperience": "system",
     "DeviceRestartBehavior": "basedOnReturnCode",

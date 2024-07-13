@@ -1,7 +1,7 @@
 {
   "Application": {
     "Name": "MicrosoftOneDrive",
-    "Filter": "Get-EvergreenAppFromApi -Name \"MicrosoftOneDrive\" | Where-Object { $_.Architecture -eq \"x64\" -and $_.Ring -eq \"Production\" } | Select-Object -First 1",
+    "Filter": "Get-EvergreenAppFromApi -Name \"MicrosoftOneDrive\" | Where-Object { $_.Architecture -eq \"AMD64\" -and $_.Ring -eq \"Production\" } | Select-Object -First 1",
     "Title": "Microsoft OneDrive",
     "Language": "en-US",
     "Architecture": "x64"
@@ -24,9 +24,9 @@
     "PSPackageFactoryGuid": "17d5ae82-382e-4f2f-92d9-130fec56964b"
   },
   "Program": {
-    "InstallTemplate": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
-    "InstallCommand": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
-    "UninstallCommand": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Uninstall.ps1",
+    "InstallTemplate": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "InstallCommand": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "UninstallCommand": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Uninstall.ps1",
     "InstallExperience": "system",
     "DeviceRestartBehavior": "suppress",
     "AllowAvailableUninstall": false
