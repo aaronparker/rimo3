@@ -222,6 +222,11 @@ process {
                     # $HttpClient.Dispose()
                     # $FileStream.Close()
 
+                    # Create tags
+                    $Tags = [System.Collections.ArrayList]::new()
+                    [void]$Tags.Add('Evergreen')
+                    [void]$Tags.Add($AppJson.Information.Publisher)
+
                     $params = @{
                         Uri             = $RimoUploadManualUri
                         Method          = "POST"
@@ -230,18 +235,18 @@ process {
                             "Authorization" = "Bearer $($Token.access_token)"
                         }
                         Form            = @{
-                            "file"             = (Get-Item -Path $ZipFile.FullName)
-                            "displayName"      = $AppJson.Information.DisplayName
-                            "comment"          = "Imported by Evergreen"
-                            "fileName"         = $AppJson.PackageInformation.SetupFile # (if ($EvergreenApp.FileName.Length -gt 0) { $EvergreenApp.FileName } else { $(Split-Path -Path $EvergreenApp.URI -Leaf) })
-                            "publisher"        = $AppJson.Information.Publisher
-                            "name"             = $AppJson.Application.Title
-                            "version"          = $EvergreenApp.Version
-                            "installCommand"   = "$($AppJson.PackageInformation.SetupFile) $ArgumentList"
+                            "file"            = (Get-Item -Path $ZipFile.FullName)
+                            "displayName"    = $AppJson.Information.DisplayName
+                            "comment"        = "Imported by Evergreen"
+                            "fileName"        = $AppJson.PackageInformation.SetupFile
+                            "publisher"      = $AppJson.Information.Publisher
+                            "name"           = $AppJson.Application.Title
+                            "version"        = $EvergreenApp.Version
+                            "installCommand" = "$($AppJson.PackageInformation.SetupFile) $ArgumentList"
                             #"installCommand"   = $AppJson.Program.InstallCommand
                             #"uninstallCommand" = $AppJson.Program.UninstallCommand
-                            "tags"             = @("Evergreen", $AppJson.Information.Publisher)
-                            "progressStep"     = "2"
+                            "tags"           = $Tags
+                            "progressStep"   = "2"
                         }
                         ContentType     = "multipart/form-data"
                         UseBasicParsing = $true
