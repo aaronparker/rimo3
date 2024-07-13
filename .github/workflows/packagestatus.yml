@@ -39,4 +39,4 @@ jobs:
                 OktaStub     = "$env:OKTA_STUB"
                 ErrorAction  = "Stop"
             }
-            & "${{ github.workspace }}\Get-PackageStatus.ps1" @params
+            & "${{ github.workspace }}\scripts\Get-PackageStatus.ps1" @params
