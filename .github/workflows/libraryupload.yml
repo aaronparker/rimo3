@@ -5,9 +5,13 @@ env:
 
 on:
   workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "**/App.json"
 
 jobs:
-  create-package:
+  upload-library:
     runs-on: windows-latest
 
     steps:
@@ -33,7 +37,7 @@ jobs:
             Import-Module -Name "Evergreen", "VcRedist" -Force
             New-Item -Path "${{ github.workspace }}\working" -ItemType Directory -Force
 
-            # Authenticate to the Graph API; expects secrets to be passed into environment variables
+            # Authenticate to the Okta API and import the library
             $params = @{
                 ClientId     = "$env:CLIENT_ID"
                 ClientSecret = "$env:CLIENT_SECRET"
