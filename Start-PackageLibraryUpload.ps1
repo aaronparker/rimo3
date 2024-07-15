@@ -243,10 +243,10 @@ process {
                             "Authorization" = "Bearer $($Token.access_token)"
                         }
                         Form            = @{
-                            "file"            = (Get-Item -Path $ZipFile.FullName)
+                            "file"           = (Get-Item -Path $ZipFile.FullName)
                             "displayName"    = $AppJson.Information.DisplayName
                             "comment"        = "Imported by Evergreen"
-                            "fileName"        = $AppJson.PackageInformation.SetupFile
+                            "fileName"       = $AppJson.PackageInformation.SetupFile
                             "publisher"      = $AppJson.Information.Publisher
                             "name"           = $AppJson.Application.Title
                             "version"        = $EvergreenApp.Version
@@ -258,6 +258,7 @@ process {
                         }
                         ContentType     = "multipart/form-data"
                         UseBasicParsing = $true
+                        ErrorAction     = "Continue"
                     }
                     $Result = Invoke-RestMethod @params
                     if ($Result.IsSuccessStatusCode -eq $false) {
