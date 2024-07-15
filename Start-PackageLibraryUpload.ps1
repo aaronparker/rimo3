@@ -128,7 +128,12 @@ process {
         $EvergreenApp = Invoke-Expression -Command $AppJson.Application.Filter
 
         # See if the app has already been imported
-        $AppStatus = $Status | Where-Object { [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and $_.fileName -eq $AppJson.PackageInformation.SetupFile }
+        try {
+            $AppStatus = $Status | Where-Object { [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and $_.fileName -eq $AppJson.PackageInformation.SetupFile }
+        }
+        catch {
+            $AppStatus = [System.String]::Empty
+        }
 
         # If the app doesn't exist, then let's import it
         if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
@@ -235,40 +240,44 @@ process {
                     [void]$Tags.Add('Evergreen')
                     [void]$Tags.Add($AppJson.Information.Publisher)
 
-                    $params = @{
-                        Uri             = $RimoUploadManualUri
-                        Method          = "POST"
-                        Headers         = @{
-                            "accept"        = "application/json"
-                            "Authorization" = "Bearer $($Token.access_token)"
+                    try {
+                        $params = @{
+                            Uri             = $RimoUploadManualUri
+                            Method          = "POST"
+                            Headers         = @{
+                                "accept"        = "application/json"
+                                "Authorization" = "Bearer $($Token.access_token)"
+                            }
+                            Form            = @{
+                                "file"           = (Get-Item -Path $ZipFile.FullName)
+                                "displayName"    = $AppJson.Information.DisplayName
+                                "comment"        = "Imported by Evergreen"
+                                "fileName"       = $AppJson.PackageInformation.SetupFile
+                                "publisher"      = $AppJson.Information.Publisher
+                                "name"           = $AppJson.Application.Title
+                                "version"        = $EvergreenApp.Version
+                                "installCommand" = "$($AppJson.PackageInformation.SetupFile) $ArgumentList"
+                                #"installCommand"   = $AppJson.Program.InstallCommand
+                                #"uninstallCommand" = $AppJson.Program.UninstallCommand
+                                "tags"           = $Tags
+                                "progressStep"   = "2"
+                            }
+                            ContentType     = "multipart/form-data"
+                            UseBasicParsing = $true
+                            ErrorAction     = "Continue"
                         }
-                        Form            = @{
-                            "file"           = (Get-Item -Path $ZipFile.FullName)
-                            "displayName"    = $AppJson.Information.DisplayName
-                            "comment"        = "Imported by Evergreen"
-                            "fileName"       = $AppJson.PackageInformation.SetupFile
-                            "publisher"      = $AppJson.Information.Publisher
-                            "name"           = $AppJson.Application.Title
-                            "version"        = $EvergreenApp.Version
-                            "installCommand" = "$($AppJson.PackageInformation.SetupFile) $ArgumentList"
-                            #"installCommand"   = $AppJson.Program.InstallCommand
-                            #"uninstallCommand" = $AppJson.Program.UninstallCommand
-                            "tags"           = $Tags
-                            "progressStep"   = "2"
-                        }
-                        ContentType     = "multipart/form-data"
-                        UseBasicParsing = $true
-                        ErrorAction     = "Continue"
+                        $Result = Invoke-RestMethod @params
                     }
-                    $Result = Invoke-RestMethod @params
-                    if ($Result.IsSuccessStatusCode -eq $false) {
-                        Write-Error -Message $Result.ReasonPhrase
+                    catch {
+                        if ($Result.IsSuccessStatusCode -eq $false) {
+                            Write-Warning -Message $Result.ReasonPhrase
+                        }
                     }
                     #endregion
                 }
             }
             else {
-                Write-Error -Message "File not found: $($OutFile.FullName)"
+                Write-Warning -Message "File not found: $($OutFile.FullName)"
             }
         }
         else {
