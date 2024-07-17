@@ -122,6 +122,8 @@ process {
 
         # Create a working directory
         $WorkingDir = "$Path\$($AppJson.Application.Name)"
+        if (Test-Path -Path $WorkingDir) { Remove-Item -Path $WorkingDir -Recurse -Force -ErrorAction "SilentlyContinue" }
+        New-Item -Path $WorkingDir -ItemType "Directory" -Force -ErrorAction "SilentlyContinue" | Out-Null
         Write-Host "Working directory: $WorkingDir"
 
         # Download the application with Evergreen
