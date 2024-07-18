@@ -22,12 +22,12 @@ jobs:
         working-directory: "${{ github.workspace }}"
         run: |
           $params = @{
-            Name               = "Pester"
+            Name               = "Pester", "Evergreen"
             SkipPublisherCheck = $true
             ErrorAction        = "Stop"
           }
           Install-Module @params
-          Import-Module -Name "Pester" -Force -ErrorAction "Stop"
+          Import-Module -Name "Pester", "Evergreen" -Force -ErrorAction "Stop"
           Import-Module -Name "$env:GITHUB_WORKSPACE\Evergreen" -Force
 
           $Config = [PesterConfiguration]::Default
