@@ -35,7 +35,6 @@ jobs:
           }
           Install-Module @params
           Import-Module -Name "Pester", "Evergreen" -Force -ErrorAction "Stop"
-          Import-Module -Name "$env:GITHUB_WORKSPACE\Evergreen" -Force
 
           $Config = [PesterConfiguration]::Default
           $Config.Run.Path = "$env:GITHUB_WORKSPACE\tests"
