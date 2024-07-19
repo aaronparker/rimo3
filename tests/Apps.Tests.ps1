@@ -7,29 +7,24 @@
 param ()
 
 BeforeDiscovery {
-
     # Get the App.json for each app
-    $Applications = Get-ChildItem -Path "$env:GITHUB_WORKSPACE\Library" -Include "App.json" -Recurse -ErrorAction "SilentlyContinue" | `
-        ForEach-Object { Get-Content -Path $_.FullName | ConvertFrom-Json }
+    $Files = Get-ChildItem -Path "./Library" -Include "App.json" -Recurse -ErrorAction "Stop"
+    Write-Host "Found $($Applications.Count) App.json files"
 }
 
-Describe -Name "Validate app filters in App.json: <AppJson.Application.Name>" -ForEach $Applications {
+Describe -Name "File - <_>" -ForEach $Files {
     BeforeAll {
-        $AppJson = $_
-        $EvergreenApp = Invoke-Expression -Command $AppJson.Application.Filter
+        $AppJson = Get-Content -Path $_.FullName | ConvertFrom-Json
+        $Name = $AppJson.Application.Name
     }
 
-    Context "Application function <AppJson.Application.Name> should return something" -ForEach $EvergreenApp {
-        BeforeAll {
-            $Item = $_
+    Context "App JSON filter should return something: <Name>" {
+        It "Output should be a PSCustomObject" {
+            { $EvergreenApp = Invoke-Expression -Command $AppJson.Application.Filter } | Should -BeOfType "PSCustomObject"
         }
 
-        It "Output from <AppJson.Application.Name> should not be null" {
-            $Item | Should -Not -BeNullOrEmpty
-        }
-
-        It "Output from <AppJson.Application.Name> should return the expected output type" {
-            $Item | Should -BeOfType "PSCustomObject"
+        It "Output should have 1 or more items" {
+            ({ $EvergreenApp = Invoke-Expression -Command $AppJson.Application.Filter }).Count | Should -BeGreaterThan 0
         }
     }
 }
