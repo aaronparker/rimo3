@@ -109,6 +109,4 @@ process {
             $Response
         }
     }
-
-    $Status
 }
