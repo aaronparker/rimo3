@@ -50,45 +50,49 @@ begin {
     }
     $Token = Invoke-RestMethod @params
 
+    # Get the status of the application sequences
+    Write-Host "Getting application sequence status"
+    $params = @{
+        Uri             = $RimoPackagesUri
+        Headers         = @{
+            "Accept"        = "application/json; utf-8"
+            "Authorization" = "Bearer $($Token.access_token)"
+            "Content-Type"  = "application/x-www-form-urlencoded"
+            "Cache-Control" = "no-cache"
+        }
+        Method          = "GET"
+        UseBasicParsing = $true
+        ErrorAction     = "Stop"
+    }
+    $Status = Invoke-RestMethod @params
+
     # Import the Evergreen library
     $LibraryItems = Get-ChildItem -Path $Library -Directory -ErrorAction "Stop"
 }
 process {
     foreach ($App in $LibraryItems) {
-        Write-Host "Processing: $($App.Name)"
+        Write-Host ""
+        Write-Host "Processing directory: $($App.FullName)"
+
+        # Import the App.json
+        $AppJson = Get-Content -Path "$($App.FullName)\App.json" -Raw | ConvertFrom-Json
+        Write-Host "Processing app: $($AppJson.Application.Filter)"
 
         # Get the application with Evergreen
-        $WhereBlock = [ScriptBlock]::Create($App.Filter)
-        $EvergreenApp = Get-EvergreenApp -Name $App.EvergreenApp | `
-            Where-Object $WhereBlock | `
-            Select-Object -First 1
+        $EvergreenApp = Invoke-Expression -Command $AppJson.Application.Filter
 
-        # Get the status of the application sequence
-        Write-Host "Getting application sequence status"
-        $params = @{
-            Uri             = $RimoPackagesUri
-            Headers         = @{
-                "Accept"        = "application/json; utf-8"
-                "Authorization" = "Bearer $($Token.access_token)"
-                "Content-Type"  = "application/x-www-form-urlencoded"
-                "Cache-Control" = "no-cache"
-            }
-            Method          = "GET"
-            UseBasicParsing = $true
-            ErrorAction     = "Stop"
+        # See if the app has already been imported
+        try {
+            $AppStatus = $Status | Where-Object { [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and $_.fileName -eq $AppJson.PackageInformation.SetupFile }
         }
-        $Status = Invoke-RestMethod @params
-
-        # Match app to status
-        if ($null -eq $EvergreenApp.Filename) {
-            $AppStatus = $Status | Where-Object { [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and $_.fileName -eq $(Split-Path -Path $EvergreenApp.Uri -Leaf) }
+        catch {
+            $AppStatus = [System.String]::Empty
         }
-        else {
-            $AppStatus = $Status | Where-Object { [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and $_.fileName -eq $EvergreenApp.Filename }
-        }
-        Write-Host "Application id: $($AppStatus.applicationPackageId)"
 
         if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
+            Write-Host -Message "Application not found in Rimo3: $($AppJson.Information.DisplayName)"
+        }
+        else {
             $params = @{
                 Uri             = "$RimoPackagesUri/$($AppStatus.applicationPackageId)/sequences"
                 Headers         = @{
@@ -103,9 +107,6 @@ process {
             }
             $Response = Invoke-RestMethod @params
             $Response
-        }
-        else {
-            Write-Host -Message "Application not found in Rimo3"
         }
     }
 

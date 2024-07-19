@@ -126,7 +126,7 @@ process {
         New-Item -Path $WorkingDir -ItemType "Directory" -Force -ErrorAction "SilentlyContinue" | Out-Null
         Write-Host "Working directory: $WorkingDir"
 
-        # Download the application with Evergreen
+        # Get the application with Evergreen
         $EvergreenApp = Invoke-Expression -Command $AppJson.Application.Filter
 
         # See if the app has already been imported
