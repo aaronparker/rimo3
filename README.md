@@ -2,6 +2,8 @@
 
 Evergreen and Rimo3 Cloud integration proof-of-concept.
 
+[![Validate apps](https://github.com/aaronparker/rimo3/actions/workflows/tests.yml/badge.svg)](https://github.com/aaronparker/rimo3/actions/workflows/tests.yml)
+
 ## Update Secrets
 
 Add the required secrets to the repository:

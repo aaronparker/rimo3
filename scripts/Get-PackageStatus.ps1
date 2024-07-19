@@ -1,14 +1,13 @@
-#requires -Version 5.1
-#requires -Modules "Evergreen"
 <#
     Get package status for Evergreen apps from Rimo3
 #>
+#requires -Version 5.1
+#requires -Modules "Evergreen"
 [CmdletBinding(SupportsShouldProcess = $true)]
-param (
-    
+param (    
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [System.String] $Apps = "EvergreenLibrary.json",
+    [System.String] $Library = ".\Library",
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
@@ -52,10 +51,10 @@ begin {
     $Token = Invoke-RestMethod @params
 
     # Import the Evergreen library
-    $Library = Get-Content -Path $Apps | ConvertFrom-Json -ErrorAction "Stop"
+    $LibraryItems = Get-ChildItem -Path $Library -Directory -ErrorAction "Stop"
 }
 process {
-    foreach ($App in $Library.Applications) {
+    foreach ($App in $LibraryItems) {
         Write-Host "Processing: $($App.Name)"
 
         # Get the application with Evergreen
