@@ -9,7 +9,6 @@ param ()
 BeforeDiscovery {
     # Get the App.json for each app
     $Files = Get-ChildItem -Path "./Library" -Include "App.json" -Recurse -ErrorAction "Stop"
-    Write-Host "Found $($Applications.Count) App.json files"
 }
 
 Describe -Name "File - <_>" -ForEach $Files {
