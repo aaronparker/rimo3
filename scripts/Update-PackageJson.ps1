@@ -12,7 +12,7 @@ param (
     [System.String] $Path = $PWD,
 
     [Parameter()]
-    [System.String] $PackageFolder = "Library",
+    [System.String[]] $PackageFolder = @("Library", "Library2", "Library3"),
 
     [Parameter()]
     [System.String] $PackageManifest = "App.json",
@@ -24,7 +24,7 @@ param (
 try {
     # Read the list of applications; we're assuming that $Manifest exists
     Write-Host -ForegroundColor "Cyan" "Get package list from: $([System.IO.Path]::Combine($Path, $PackageFolder))."
-    $ManifestList = Get-ChildItem -Path $([System.IO.Path]::Combine($Path, $PackageFolder)) -Recurse -Filter $PackageManifest
+    $ManifestList = $PackageFolder | ForEach-Object { Get-ChildItem -Path $([System.IO.Path]::Combine($Path, $_)) -Recurse -Filter $PackageManifest }
     Write-Host -ForegroundColor "Cyan" "Found $($ManifestList.Count) packages"
 }
 catch {
