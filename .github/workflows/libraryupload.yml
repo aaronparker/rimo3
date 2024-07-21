@@ -5,6 +5,15 @@ env:
 
 on:
   workflow_dispatch:
+    inputs:
+      path:
+        description: Library directory
+        required: true
+        type: choice
+        options:
+          - Library
+          - Library2
+          - Library3
   push:
     branches: ["main"]
     paths:
@@ -25,8 +34,9 @@ jobs:
             updatable: true
             shell: pwsh
 
-        - name: Import library
-          id: import-library
+        - name: Import default library
+          id: import-library1
+          if: github.event_name == 'push'
           shell: pwsh
           working-directory: ${{ github.workspace }}
           env:
@@ -43,6 +53,30 @@ jobs:
                 ClientSecret = "$env:CLIENT_SECRET"
                 OktaStub     = "$env:OKTA_STUB"
                 Library      = "${{ github.workspace }}\Library"
+                Path         = "${{ github.workspace }}\working"
+                ErrorAction  = "Stop"
+            }
+            & "${{ github.workspace }}\Start-PackageLibraryUpload.ps1" @params
+
+        - name: Import custom library
+          id: import-library2
+          if: github.event_name == 'workflow_dispatch'
+          shell: pwsh
+          working-directory: ${{ github.workspace }}
+          env:
+            CLIENT_ID: ${{ secrets.CLIENT_ID }}
+            CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+            OKTA_STUB: ${{ secrets.OKTA_STUB }}
+          run: |
+            Import-Module -Name "Evergreen", "VcRedist" -Force
+            New-Item -Path "${{ github.workspace }}\working" -ItemType Directory -Force
+
+            # Authenticate to the Okta API and import the library
+            $params = @{
+                ClientId     = "$env:CLIENT_ID"
+                ClientSecret = "$env:CLIENT_SECRET"
+                OktaStub     = "$env:OKTA_STUB"
+                Library      = "${{ github.event.inputs.path }}"
                 Path         = "${{ github.workspace }}\working"
                 ErrorAction  = "Stop"
             }
