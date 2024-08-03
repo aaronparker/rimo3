@@ -121,7 +121,7 @@ process {
         Write-Host "Processing app: $($AppJson.Application.Filter)"
 
         # Create a working directory
-        $WorkingDir = "$Path\$($AppJson.Application.Name)"
+        $WorkingDir = Join-Path -Path $Path -ChildPath $($AppJson.Application.Name)
         if (Test-Path -Path $WorkingDir) { Remove-Item -Path $WorkingDir -Recurse -Force -ErrorAction "SilentlyContinue" }
         New-Item -Path $WorkingDir -ItemType "Directory" -Force -ErrorAction "SilentlyContinue" | Out-Null
         Write-Host "Working directory: $WorkingDir"
@@ -158,11 +158,12 @@ process {
                     # Compress the downloaded installer
                     $params = @{
                         Path            = "$WorkingDir\*"
-                        DestinationPath = "$WorkingDir\$($AppJson.Application.Name).zip"
+                        DestinationPath = (Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")
+                        Force           = $true
                         ErrorAction     = "Stop"
                     }
                     Compress-Archive @params
-                    $ZipFile = Get-ChildItem -Path "$WorkingDir\$($AppJson.Application.Name).zip"
+                    $ZipFile = Get-ChildItem -Path (Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")
                     Write-Host "Uploading: $($ZipFile.FullName)"
 
                     # Upload the MSI/MSIX downloaded installer ZIP into Rimo3
@@ -200,12 +201,12 @@ process {
                     # Compress the downloaded installers and supporting files
                     $params = @{
                         Path            = "$WorkingDir\*"
-                        DestinationPath = "$WorkingDir\$($AppJson.Application.Name).zip"
+                        DestinationPath = (Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")
                         Force           = $true
                         ErrorAction     = "Stop"
                     }
                     Compress-Archive @params
-                    $ZipFile = Get-ChildItem -Path "$WorkingDir\$($AppJson.Application.Name).zip"
+                    $ZipFile = Get-ChildItem -Path (Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")
                     Write-Host "Uploading: $($ZipFile.FullName)"
 
                     # Upload the EXE downloaded installer ZIP into Rimo3
@@ -251,18 +252,18 @@ process {
                                 "Authorization" = "Bearer $($Token.access_token)"
                             }
                             Form            = @{
-                                "file"           = (Get-Item -Path $ZipFile.FullName)
-                                "displayName"    = $AppJson.Information.DisplayName
-                                "comment"        = "Imported by Evergreen"
-                                "fileName"       = $AppJson.PackageInformation.SetupFile
-                                "publisher"      = $AppJson.Information.Publisher
-                                "name"           = $AppJson.Application.Title
-                                "version"        = $EvergreenApp.Version
-                                "installCommand" = "$($AppJson.PackageInformation.SetupFile) $ArgumentList"
-                                #"installCommand"   = $AppJson.Program.InstallCommand
-                                #"uninstallCommand" = $AppJson.Program.UninstallCommand
-                                "tags"           = $Tags
-                                "progressStep"   = "2"
+                                "file"             = (Get-Item -Path $ZipFile.FullName)
+                                "displayName"      = $AppJson.Information.DisplayName
+                                "comment"          = "Imported by Evergreen"
+                                "fileName"         = $AppJson.PackageInformation.SetupFile
+                                "publisher"        = $AppJson.Information.Publisher
+                                "name"             = $AppJson.Application.Title
+                                "version"          = $EvergreenApp.Version
+                                #"installCommand" = "$($AppJson.PackageInformation.SetupFile) $ArgumentList"
+                                "installCommand"   = $AppJson.Program.InstallCommand
+                                "uninstallCommand" = $AppJson.Program.UninstallCommand
+                                "tags"             = $Tags
+                                "progressStep"     = "2"
                             }
                             ContentType     = "multipart/form-data"
                             UseBasicParsing = $true
