@@ -123,7 +123,7 @@ begin {
 
 process {
     foreach ($App in $LibraryItems) {
-        Write-Host ""
+        Write-Host "--"
         Write-Host "Processing directory: $($App.FullName)" -ForegroundColor "Yellow"
 
         # Import the App.json
