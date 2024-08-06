@@ -75,7 +75,7 @@ begin {
 
     # Authenticate to the Okta API
     $params = @{
-        Uri             = "https://rimo3.okta.com/oauth2/$OktaStub/v1/token"
+        Uri             = "https://rimo3.okta.com/oauth2/$($OktaStub)/v1/token"
         Body            = @{
             "grant_type"  = "client_credentials"
             scope         = "access_token"
