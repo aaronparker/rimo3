@@ -74,28 +74,34 @@ begin {
     Set-Variable -Name "RimoUploadManualUri" -Value "$RimoUploadUri/manual" -Option "Constant"
 
     # Authenticate to the Okta API
-    $params = @{
-        Uri             = "https://rimo3.okta.com/oauth2/$($OktaStub)/v1/token"
-        Body            = @{
-            "grant_type"  = "client_credentials"
-            scope         = "access_token"
-            client_id     = $ClientId
-            client_secret = $ClientSecret
+    try {
+        $params = @{
+            Uri             = "https://rimo3.okta.com/oauth2/$($OktaStub)/v1/token"
+            Body            = @{
+                "grant_type"  = "client_credentials"
+                scope         = "access_token"
+                client_id     = $ClientId
+                client_secret = $ClientSecret
+            }
+            Headers         = @{
+                "Accept"        = "application/json; utf-8"
+                "Content-Type"  = "application/x-www-form-urlencoded"
+                "Cache-Control" = "no-cache"
+            }
+            Method          = "POST"
+            UseBasicParsing = $true
+            ErrorAction     = "Stop"
         }
-        Headers         = @{
-            "Accept"        = "application/json; utf-8"
-            "Content-Type"  = "application/x-www-form-urlencoded"
-            "Cache-Control" = "no-cache"
-        }
-        Method          = "POST"
-        UseBasicParsing = $true
-        ErrorAction     = "Stop"
+        $Token = Invoke-RestMethod @params
+        Write-Host "Login successful. Token expires in: $($Token.expires_in)"
     }
-    $Token = Invoke-RestMethod @params
-    Write-Host "Login successful. Token expires in: $($Token.expires_in)"
+    catch {
+        Write-Warning -Message "Failed to authenticate to the Okta API. Error: $($_.Exception.Message)"
+        break
+    }
 
     # Get the status of the application sequences
-    Write-Host "Getting application sequence status"
+    Write-Host "Getting application sequences status from Rimo3"
     $params = @{
         Uri             = $RimoPackagesUri
         Headers         = @{
@@ -114,13 +120,15 @@ begin {
     # Import the Evergreen library
     $LibraryItems = Get-ChildItem -Path $Library -Directory -ErrorAction "Stop"
 }
+
 process {
     foreach ($App in $LibraryItems) {
-        Write-Host "Processing directory: $($App.FullName)"
+        Write-Host ""
+        Write-Host "Processing directory: $($App.FullName)" -ForegroundColor "Yellow"
 
         # Import the App.json
         $AppJson = Get-Content -Path "$($App.FullName)\App.json" -Raw | ConvertFrom-Json
-        Write-Host "Processing app: $($AppJson.Application.Filter)"
+        Write-Host "Processing app: $($AppJson.Application.Filter)" -ForegroundColor "Cyan"
 
         # Create a working directory
         $WorkingDir = Join-Path -Path $Path -ChildPath $($AppJson.Application.Name)
@@ -136,7 +144,8 @@ process {
             $AppStatus = $Status | Where-Object { [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and $_.fileName -eq $AppJson.PackageInformation.SetupFile }
         }
         catch {
-            $AppStatus = [System.String]::Empty
+            $AppStatus = $Status | Where-Object { $_.productVersion -eq $EvergreenApp.Version -and $_.fileName -eq $AppJson.PackageInformation.SetupFile }
+            #$AppStatus = [System.String]::Empty
         }
 
         # If the app doesn't exist, then let's import it
@@ -155,130 +164,130 @@ process {
                 }
 
                 #region MSI
-                if ($AppJson.PackageInformation.SetupFile -match "\.msi$|\.msix$") {
+                # if ($AppJson.PackageInformation.SetupFile -match "\.msi$|\.msix$") {
 
-                    # Compress the downloaded installer
-                    $params = @{
-                        Path            = "$WorkingDir\*"
-                        DestinationPath = (Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")
-                        Force           = $true
-                        ErrorAction     = "Stop"
+                #     # Compress the downloaded installer
+                #     $params = @{
+                #         Path            = "$WorkingDir\*"
+                #         DestinationPath = (Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")
+                #         Force           = $true
+                #         ErrorAction     = "Stop"
+                #     }
+                #     Compress-Archive @params
+                #     $ZipFile = Get-ChildItem -Path (Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")
+                #     Write-Host "Uploading: $($ZipFile.FullName)"
+
+                #     # Upload the MSI/MSIX downloaded installer ZIP into Rimo3
+                #     Add-Type -AssemblyName "System.Net.Http"
+                #     $HttpClient = New-Object -TypeName "System.Net.Http.HttpClient"
+                #     $HttpClient.DefaultRequestHeaders.Authorization = New-Object -TypeName "System.Net.Http.Headers.AuthenticationHeaderValue"("Bearer", $($Token.access_token))
+                #     $FileStream = [System.IO.File]::OpenRead($ZipFile.FullName)
+                #     $FileContent = New-Object -TypeName "System.Net.Http.StreamContent" -ArgumentList $FileStream
+                #     $Content = New-Object -TypeName "System.Net.Http.MultipartFormDataContent"
+                #     $Content.Add($FileContent, "file", $ZipFile.Name)
+                #     $Result = $HttpClient.PostAsync($RimoUploadUri, $Content).Result
+                #     Write-Host $Result.ToString()
+                #     $FileStream.Close()
+                # }
+                # #endregion
+                # else {
+                #region EXE
+                if (Test-Path -Path "$($App.FullName)\Source\Install.json") {
+                    # Copy supporting files
+                    Copy-Item -Path "$($App.FullName)\Source\Install.json" -Destination "$WorkingDir\Install.json"
+                    if (Test-Path -Path "$($App.FullName)\Install.ps1") {
+                        Copy-Item -Path "$($App.FullName)\Install.ps1" -Destination "$WorkingDir\Install.ps1"
                     }
-                    Compress-Archive @params
-                    $ZipFile = Get-ChildItem -Path (Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")
-                    Write-Host "Uploading: $($ZipFile.FullName)"
+                    else {
+                        Copy-Item -Path "$Library\Install.ps1" -Destination "$WorkingDir\Install.ps1"
+                    }
 
-                    # Upload the MSI/MSIX downloaded installer ZIP into Rimo3
-                    Add-Type -AssemblyName "System.Net.Http"
-                    $HttpClient = New-Object -TypeName "System.Net.Http.HttpClient"
-                    $HttpClient.DefaultRequestHeaders.Authorization = New-Object -TypeName "System.Net.Http.Headers.AuthenticationHeaderValue"("Bearer", $($Token.access_token))
-                    $FileStream = [System.IO.File]::OpenRead($ZipFile.FullName)
-                    $FileContent = New-Object -TypeName "System.Net.Http.StreamContent" -ArgumentList $FileStream
-                    $Content = New-Object -TypeName "System.Net.Http.MultipartFormDataContent"
-                    $Content.Add($FileContent, "file", $ZipFile.Name)
-                    $Result = $HttpClient.PostAsync($RimoUploadUri, $Content).Result
-                    Write-Host $Result.ToString()
-                    $FileStream.Close()
+                    # Read the install.json file
+                    $Install = Get-Content -Path "$($App.FullName)\Source\Install.json" | ConvertFrom-Json
+                    $ArgumentList = $Install.InstallTasks.ArgumentList -replace "#SetupFile", $AppJson.PackageInformation.SetupFile
+                    $ArgumentList = $ArgumentList -replace "#LogName", $AppJson.PackageInformation.SetupFile
+                    $ArgumentList = $ArgumentList -replace "#LogPath", "$Env:SystemRoot\Logs"
                 }
-                #endregion
-                else {
-                    #region EXE
-                    if (Test-Path -Path "$($App.FullName)\Source\Install.json") {
-                        # Copy supporting files
-                        Copy-Item -Path "$($App.FullName)\Source\Install.json" -Destination "$WorkingDir\Install.json"
-                        if (Test-Path -Path "$($App.FullName)\Install.ps1") {
-                            Copy-Item -Path "$($App.FullName)\Install.ps1" -Destination "$WorkingDir\Install.ps1"
-                        }
-                        else {
-                            Copy-Item -Path "$Library\Install.ps1" -Destination "$WorkingDir\Install.ps1"
-                        }
 
-                        # Read the install.json file
-                        $Install = Get-Content -Path "$($App.FullName)\Source\Install.json" | ConvertFrom-Json
-                        $ArgumentList = $Install.InstallTasks.ArgumentList -replace "#SetupFile", $AppJson.PackageInformation.SetupFile
-                        $ArgumentList = $ArgumentList -replace "#LogName", $AppJson.PackageInformation.SetupFile
-                        $ArgumentList = $ArgumentList -replace "#LogPath", "$Env:SystemRoot\Logs"
-                    }
+                # Compress the downloaded installers and supporting files
+                $params = @{
+                    Path            = "$WorkingDir\*"
+                    DestinationPath = (Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")
+                    Force           = $true
+                    ErrorAction     = "Stop"
+                }
+                Compress-Archive @params
+                $ZipFile = Get-ChildItem -Path (Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")
+                Write-Host "Uploading: $($ZipFile.FullName)"
 
-                    # Compress the downloaded installers and supporting files
+                # Upload the EXE downloaded installer ZIP into Rimo3
+                # Write-Host "Uploading: $($ZipFile.FullName)"
+                # Add-Type -AssemblyName "System.Net.Http"
+                # $HttpClient = New-Object -TypeName "System.Net.Http.HttpClient"
+                # $HttpClient.DefaultRequestHeaders.Authorization = New-Object -TypeName "System.Net.Http.Headers.AuthenticationHeaderValue"("Bearer", $($Token.access_token))
+                # $FileStream = [System.IO.File]::OpenRead($ZipFile.FullName)
+                # $FileContent = New-Object -TypeName "System.Net.Http.StreamContent" -ArgumentList $FileStream
+                # $Content = New-Object -TypeName "System.Net.Http.MultipartFormDataContent"
+                # $Content.Add($FileContent, "file", $ZipFile.Name)
+
+                # # Add additional properties to the content
+                # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "displayName"), $AppJson.Information.DisplayName)
+                # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "comment"), "Imported by Evergreen")
+                # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "fileName"), "$(Split-Path -Path $EvergreenApp.URI -Leaf)")
+                # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "publisher"), $AppJson.Information.Publisher)
+                # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "name"), $AppJson.Application.Title)
+                # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "version"), $EvergreenApp.Version)
+                # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "installCommand"), $AppJson.Program.InstallCommand)
+                # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "uninstallCommand"), $AppJson.Program.UninstallCommand)
+                # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "tags"), "Evergreen")
+                # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "progressStep"), "2")
+
+                # # Post the package to the API
+                # $Result = $HttpClient.PostAsync($RimoUploadManualUri, $Content).Result
+                # Write-Host $Result.ToString()
+                # #if ($Result.StatusCode -eq 400) { throw "$($Result.ReasonPhrase)" }
+                # $HttpClient.Dispose()
+                # $FileStream.Close()
+
+                # Create tags
+                $Tags = [System.Collections.ArrayList]::new()
+                [void]$Tags.Add('Evergreen')
+                [void]$Tags.Add($AppJson.Information.Publisher)
+
+                try {
                     $params = @{
-                        Path            = "$WorkingDir\*"
-                        DestinationPath = (Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")
-                        Force           = $true
-                        ErrorAction     = "Stop"
-                    }
-                    Compress-Archive @params
-                    $ZipFile = Get-ChildItem -Path (Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")
-                    Write-Host "Uploading: $($ZipFile.FullName)"
-
-                    # Upload the EXE downloaded installer ZIP into Rimo3
-                    # Write-Host "Uploading: $($ZipFile.FullName)"
-                    # Add-Type -AssemblyName "System.Net.Http"
-                    # $HttpClient = New-Object -TypeName "System.Net.Http.HttpClient"
-                    # $HttpClient.DefaultRequestHeaders.Authorization = New-Object -TypeName "System.Net.Http.Headers.AuthenticationHeaderValue"("Bearer", $($Token.access_token))
-                    # $FileStream = [System.IO.File]::OpenRead($ZipFile.FullName)
-                    # $FileContent = New-Object -TypeName "System.Net.Http.StreamContent" -ArgumentList $FileStream
-                    # $Content = New-Object -TypeName "System.Net.Http.MultipartFormDataContent"
-                    # $Content.Add($FileContent, "file", $ZipFile.Name)
-
-                    # # Add additional properties to the content
-                    # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "displayName"), $AppJson.Information.DisplayName)
-                    # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "comment"), "Imported by Evergreen")
-                    # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "fileName"), "$(Split-Path -Path $EvergreenApp.URI -Leaf)")
-                    # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "publisher"), $AppJson.Information.Publisher)
-                    # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "name"), $AppJson.Application.Title)
-                    # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "version"), $EvergreenApp.Version)
-                    # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "installCommand"), $AppJson.Program.InstallCommand)
-                    # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "uninstallCommand"), $AppJson.Program.UninstallCommand)
-                    # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "tags"), "Evergreen")
-                    # $Content.Add((New-Object -TypeName "System.Net.Http.StringContent" -ArgumentList "progressStep"), "2")
-
-                    # # Post the package to the API
-                    # $Result = $HttpClient.PostAsync($RimoUploadManualUri, $Content).Result
-                    # Write-Host $Result.ToString()
-                    # #if ($Result.StatusCode -eq 400) { throw "$($Result.ReasonPhrase)" }
-                    # $HttpClient.Dispose()
-                    # $FileStream.Close()
-
-                    # Create tags
-                    $Tags = [System.Collections.ArrayList]::new()
-                    [void]$Tags.Add('Evergreen')
-                    [void]$Tags.Add($AppJson.Information.Publisher)
-
-                    try {
-                        $params = @{
-                            Uri             = $RimoUploadManualUri
-                            Method          = "POST"
-                            Headers         = @{
-                                "accept"        = "application/json"
-                                "Authorization" = "Bearer $($Token.access_token)"
-                            }
-                            Form            = @{
-                                "file"             = (Get-Item -Path $ZipFile.FullName)
-                                "displayName"      = $AppJson.Information.DisplayName
-                                "comment"          = "Imported by Evergreen"
-                                "fileName"         = $AppJson.PackageInformation.SetupFile
-                                "publisher"        = $AppJson.Information.Publisher
-                                "name"             = $AppJson.Application.Title
-                                "version"          = $EvergreenApp.Version
-                                #"installCommand" = "$($AppJson.PackageInformation.SetupFile) $ArgumentList"
-                                "installCommand"   = $AppJson.Program.InstallCommand
-                                "uninstallCommand" = $AppJson.Program.UninstallCommand
-                                "tags"             = $Tags
-                                "progressStep"     = "2"
-                            }
-                            ContentType     = "multipart/form-data"
-                            UseBasicParsing = $true
-                            ErrorAction     = "Continue"
+                        Uri             = $RimoUploadManualUri
+                        Method          = "POST"
+                        Headers         = @{
+                            "accept"        = "application/json"
+                            "Authorization" = "Bearer $($Token.access_token)"
                         }
-                        $Result = Invoke-RestMethod @params
-                        Write-Host "Package upload status: $($Result.ReasonPhrase)"
-                    }
-                    catch {
-                        if ($Result.IsSuccessStatusCode -eq $false) {
-                            Write-Warning -Message "Package upload status: $($Result.ReasonPhrase)"
+                        Form            = @{
+                            "file"             = (Get-Item -Path $ZipFile.FullName)
+                            "displayName"      = $AppJson.Information.DisplayName
+                            "comment"          = "Imported by Evergreen"
+                            "fileName"         = $AppJson.PackageInformation.SetupFile
+                            "publisher"        = $AppJson.Information.Publisher
+                            "name"             = $AppJson.Application.Title
+                            "version"          = $EvergreenApp.Version
+                            "installCommand"   = "$($AppJson.PackageInformation.SetupFile) $ArgumentList"
+                            #"installCommand"   = $AppJson.Program.InstallCommand
+                            "uninstallCommand" = $AppJson.Program.UninstallCommand
+                            "tags"             = $Tags
+                            "progressStep"     = "2"
                         }
+                        ContentType     = "multipart/form-data"
+                        UseBasicParsing = $true
+                        ErrorAction     = "Continue"
                     }
+                    $Result = Invoke-RestMethod @params
+                    Write-Host "Package upload status: $($Result.ReasonPhrase)"
+                }
+                catch {
+                    if ($Result.IsSuccessStatusCode -eq $false) {
+                        Write-Warning -Message "Package upload status: $($Result.ReasonPhrase)"
+                    }
+                    #}
                     #endregion
                 }
             }
@@ -294,5 +303,6 @@ process {
         Remove-Variable -Name "AppStatus" -Force
     }
 }
+
 end {
 }
