@@ -11,9 +11,8 @@ on:
         required: true
         type: choice
         options:
-          - Library
+          - Library1
           - Library2
-          - Library3
   push:
     branches: ["main"]
     paths:
