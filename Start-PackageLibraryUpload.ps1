@@ -92,6 +92,7 @@ begin {
         ErrorAction     = "Stop"
     }
     $Token = Invoke-RestMethod @params
+    Write-Host "Login successful. Token expires in: $($Token.expires_in)"
 
     # Get the status of the application sequences
     Write-Host "Getting application sequence status"
@@ -108,6 +109,7 @@ begin {
         ErrorAction     = "Stop"
     }
     $Status = Invoke-RestMethod @params
+    Write-Host "Found $($Status.Count) existing packages."
 
     # Import the Evergreen library
     $LibraryItems = Get-ChildItem -Path $Library -Directory -ErrorAction "Stop"
@@ -270,10 +272,11 @@ process {
                             ErrorAction     = "Continue"
                         }
                         $Result = Invoke-RestMethod @params
+                        Write-Host "Package upload status: $($Result.ReasonPhrase)"
                     }
                     catch {
                         if ($Result.IsSuccessStatusCode -eq $false) {
-                            Write-Warning -Message $Result.ReasonPhrase
+                            Write-Warning -Message "Package upload status: $($Result.ReasonPhrase)"
                         }
                     }
                     #endregion
