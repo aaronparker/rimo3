@@ -140,11 +140,12 @@ process {
         # Get the application with Evergreen
         Write-Host "Get Evergreen app: $($AppJson.Application.Filter)" -ForegroundColor "Cyan"
         $EvergreenApp = Invoke-Expression -Command $AppJson.Application.Filter
+        Write-Host "Evergreen found version: $($EvergreenApp.Version)"
 
         # See if the app has already been imported
         try {
             # Cast version number when matching the application
-            Write-Host "Filter for existing application: $($AppJson.Information.DisplayName)"
+            Write-Host "Filter for existing application in Rimo3 Cloud: $($AppJson.Information.DisplayName)"
             $AppStatus = $Status | Where-Object {
                 [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and `
                     $_.displayName -eq $AppJson.Information.DisplayName -and `
@@ -165,7 +166,7 @@ process {
 
         # If the app doesn't exist, then let's import it
         if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
-            Write-Host "Importing: $($AppJson.Application.Title) $($EvergreenApp.Version)"
+            Write-Host "Package not found in Rimo3. Importing: $($AppJson.Information.DisplayName)"
             
             $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath $WorkingDir -ErrorAction "Stop"
             Write-Host "Saved file: $($OutFile.FullName)"
@@ -251,7 +252,7 @@ process {
                 }
                 catch {
                     Write-Host "WARNING: Package import failed with status code: $($Result.IsSuccessStatusCode)"
-                    Write-Warning -Message $Result.ReasonPhrase
+                    Write-Warning -Message $_.Exception.Message #$Result.ReasonPhrase
                 }
             }
             else {
