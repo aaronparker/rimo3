@@ -13,10 +13,10 @@ on:
         options:
           - Library1
           - Library2
-  push:
-    branches: ["main"]
-    paths:
-      - "**/App.json"
+  # push:
+  #   branches: ["main"]
+  #   paths:
+  #     - "**/App.json"
 
 jobs:
   upload-library:

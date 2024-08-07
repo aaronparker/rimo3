@@ -168,6 +168,7 @@ process {
         if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
             Write-Host "Package not found in Rimo3. Importing: $($AppJson.Information.DisplayName)"
             
+            Write-Host "Downloading: $($EvergreenApp.URI)"
             $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath $WorkingDir -ErrorAction "Stop"
             Write-Host "Saved file: $($OutFile.FullName)"
 
