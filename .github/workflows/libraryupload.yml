@@ -51,7 +51,7 @@ jobs:
                 ClientId     = "$env:CLIENT_ID"
                 ClientSecret = "$env:CLIENT_SECRET"
                 OktaStub     = "$env:OKTA_STUB"
-                Library      = "${{ github.workspace }}\Library"
+                Library      = "${{ github.workspace }}\Library1"
                 Path         = "${{ github.workspace }}\working"
                 ErrorAction  = "Stop"
             }
