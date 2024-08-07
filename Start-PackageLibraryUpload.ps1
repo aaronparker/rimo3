@@ -196,6 +196,7 @@ process {
                     $ArgumentList = $Install.InstallTasks.ArgumentList -replace "#SetupFile", $AppJson.PackageInformation.SetupFile
                     $ArgumentList = $ArgumentList -replace "#LogName", $AppJson.PackageInformation.SetupFile
                     $ArgumentList = $ArgumentList -replace "#LogPath", "$Env:SystemRoot\Logs"
+                    Write-Host "Setup file: $($AppJson.PackageInformation.SetupFile)"
                     Write-Host "Argument list: $ArgumentList"
                 }
 
@@ -249,9 +250,8 @@ process {
                     Start-Sleep -Seconds 30
                 }
                 catch {
-                    if ($Result.IsSuccessStatusCode -eq $false) {
-                        Write-Warning -Message "Package upload status: $($Result.ReasonPhrase)"
-                    }
+                    Write-Host "WARNING: Package import failed with status code: $($Result.IsSuccessStatusCode)"
+                    Write-Warning -Message $Result.ReasonPhrase
                 }
             }
             else {
@@ -259,7 +259,7 @@ process {
             }
         }
         else {
-            Write-Host "Application already exists in Rimo3: $($AppJson.Application.Title) $($EvergreenApp.Version)"
+            Write-Host "Application already exists in Rimo3: $($AppJson.Information.DisplayName)"
             Write-Host "Package ID: $($AppStatus.applicationPackageId)"
         }
 
