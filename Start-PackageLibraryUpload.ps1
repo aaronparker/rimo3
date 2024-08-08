@@ -120,6 +120,15 @@ begin {
     # Import the Evergreen library
     Write-Host "Importing Evergreen library from: $Library"
     $LibraryItems = Get-ChildItem -Path $Library -Directory -ErrorAction "Stop"
+
+    # Download the PSADT
+    Write-Host "Download PSAppDeployToolkit"
+    $PsadtDir = Join-Path -Path $Path "psadt"
+    New-Item -Path $PsadtDir -ItemType "Directory" -Force -ErrorAction "SilentlyContinue" | Out-Null
+    $File = Get-EvergreenApp -Name "PSAppDeployToolkit" | Save-EvergreenApp -LiteralPath $PsadtDir -ErrorAction "Stop"
+    Expand-Archive -Path $File.FullName -DestinationPath $PsadtDir
+    $PsadtSource = Join-Path -Path $PsadtDir -ChildPath "Toolkit"
+    Remove-Item -Path "$PsadtSource\Deploy-Application.ps1" -Force
 }
 
 process {
@@ -167,9 +176,13 @@ process {
         # If the app doesn't exist, then let's import it
         if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
             Write-Host "Package not found in Rimo3. Importing: $($AppJson.Information.DisplayName)"
-            
+
+            Write-Host "Copy PSADT files"
+            # Copy the PSADT files
+            Copy-Item -Path "$PsadtSource\*" -Destination $WorkingDir -Recurse -Force
+
             Write-Host "Downloading: $($EvergreenApp.URI)"
-            $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath $WorkingDir -ErrorAction "Stop"
+            $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath "$WorkingDir\Files" -ErrorAction "Stop"
             Write-Host "Saved file: $($OutFile.FullName)"
 
             if (Test-Path -Path $OutFile.FullName) {
@@ -234,8 +247,8 @@ process {
                             "publisher"        = $AppJson.Information.Publisher
                             "name"             = $AppJson.Application.Title
                             "version"          = $EvergreenApp.Version
-                            "installCommand"   = "$($AppJson.PackageInformation.SetupFile) $ArgumentList"
-                            #"installCommand"   = $AppJson.Program.InstallCommand
+                            #"installCommand"   = "$($AppJson.PackageInformation.SetupFile) $ArgumentList"
+                            "installCommand"   = $AppJson.Program.InstallCommand
                             "uninstallCommand" = $AppJson.Program.UninstallCommand
                             "tags"             = $Tags
                             "progressStep"     = "2"
