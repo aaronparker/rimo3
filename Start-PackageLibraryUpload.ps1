@@ -129,6 +129,7 @@ begin {
     Expand-Archive -Path $File.FullName -DestinationPath $PsadtDir
     $PsadtSource = Join-Path -Path $PsadtDir -ChildPath "Toolkit"
     Remove-Item -Path "$PsadtSource\Deploy-Application.ps1" -Force
+    Remove-Item -Path "$PsadtSource\.vscode" -Recurse -Force
 }
 
 process {
@@ -177,9 +178,10 @@ process {
         if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
             Write-Host "Package not found in Rimo3. Importing: $($AppJson.Information.DisplayName)"
 
-            Write-Host "Copy PSADT files"
             # Copy the PSADT files
+            Write-Host "Copy PSADT files"
             Copy-Item -Path "$PsadtSource\*" -Destination $WorkingDir -Recurse -Force
+            Copy-Item -Path "$($App.FullName)\Deploy-Application.ps1" -Destination "$WorkingDir\Deploy-Application.ps1"
 
             Write-Host "Downloading: $($EvergreenApp.URI)"
             $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath "$WorkingDir\Files" -ErrorAction "Stop"
@@ -240,10 +242,10 @@ process {
                             "Authorization" = "Bearer $($Token.access_token)"
                         }
                         Form            = @{
-                            "file"             = (Get-Item -Path $ZipFile.FullName)
+                            "file"              = (Get-Item -Path $ZipFile.FullName)
                             "displayName"      = $AppJson.Information.DisplayName
                             "comment"          = "Imported by Evergreen"
-                            "fileName"         = $AppJson.PackageInformation.SetupFile
+                            "fileName"          = $AppJson.PackageInformation.SetupFile
                             "publisher"        = $AppJson.Information.Publisher
                             "name"             = $AppJson.Application.Title
                             "version"          = $EvergreenApp.Version
