@@ -47,3 +47,7 @@ auth.json
 auth2.json
 working
 psadt
+RunHidden.vbs
+AppDeployToolkit*
+Deploy-Application.exe.config
+Library*/**/.vscode
