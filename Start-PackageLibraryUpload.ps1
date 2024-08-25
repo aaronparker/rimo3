@@ -153,24 +153,21 @@ process {
         Write-Host "Evergreen found version: $($EvergreenApp.Version)"
 
         # See if the app has already been imported
-        try {
-            # Cast version number when matching the application
-            Write-Host "Filter for existing application in Rimo3 Cloud: $($AppJson.Information.DisplayName)"
-            $AppStatus = $Status | Where-Object {
-                [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and `
-                    $_.displayName -eq $AppJson.Information.DisplayName -and `
-                    $_.manufacturer -eq $AppJson.Information.Publisher -and `
-                    $_.fileName -eq $AppJson.PackageInformation.SetupFile
-            }
+        # Cast version number when matching the application
+        Write-Host "Filter for existing application in Rimo3 Cloud: $($AppJson.Information.DisplayName)"
+        $AppStatus = $Status | Where-Object {
+            [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and `
+                $_.displayName -eq $AppJson.Information.DisplayName -and `
+                $_.manufacturer -eq $AppJson.Information.Publisher
         }
-        catch {
-            # Fall back to a direct string comparison
+
+        # Fall back to a direct string comparison
+        if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
             Write-Host "Fallback to direct string compare: $($AppJson.Information.DisplayName)"
             $AppStatus = $Status | Where-Object {
                 $_.productVersion -match $EvergreenApp.Version -and `
                     $_.displayName -eq $AppJson.Information.DisplayName -and `
-                    $_.manufacturer -eq $AppJson.Information.Publisher -and `
-                    $_.fileName -eq $AppJson.PackageInformation.SetupFile
+                    $_.manufacturer -eq $AppJson.Information.Publisher
             }
         }
 
@@ -179,8 +176,9 @@ process {
             Write-Host "Package not found in Rimo3. Importing: $($AppJson.Information.DisplayName)"
 
             # Copy the PSADT files
-            Write-Host "Copy PSADT files"
+            Write-Host "Copy PSADT files to: $WorkingDir"
             Copy-Item -Path "$PsadtSource\*" -Destination $WorkingDir -Recurse -Force
+            Write-Host "Copy $("$($App.FullName)\Deploy-Application.ps1") to: $("$WorkingDir\Deploy-Application.ps1")"
             Copy-Item -Path "$($App.FullName)\Deploy-Application.ps1" -Destination "$WorkingDir\Deploy-Application.ps1"
 
             Write-Host "Downloading: $($EvergreenApp.URI)"
@@ -242,10 +240,10 @@ process {
                             "Authorization" = "Bearer $($Token.access_token)"
                         }
                         Form            = @{
-                            "file"              = (Get-Item -Path $ZipFile.FullName)
+                            "file"             = (Get-Item -Path $ZipFile.FullName)
                             "displayName"      = $AppJson.Information.DisplayName
                             "comment"          = "Imported by Evergreen"
-                            "fileName"          = $AppJson.PackageInformation.SetupFile
+                            "fileName"         = $AppJson.PackageInformation.SetupFile
                             "publisher"        = $AppJson.Information.Publisher
                             "name"             = $AppJson.Application.Title
                             "version"          = $EvergreenApp.Version
