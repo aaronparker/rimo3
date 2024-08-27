@@ -155,10 +155,15 @@ process {
         # See if the app has already been imported
         # Cast version number when matching the application
         Write-Host "Filter for existing application in Rimo3 Cloud: $($AppJson.Information.DisplayName)"
-        $AppStatus = $Status | Where-Object {
-            [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and `
-                $_.displayName -eq $AppJson.Information.DisplayName -and `
-                $_.manufacturer -eq $AppJson.Information.Publisher
+        try {
+            $AppStatus = $Status | Where-Object {
+                [System.Version]$_.productVersion -match [System.Version]$EvergreenApp.Version -and `
+                    $_.displayName -eq $AppJson.Information.DisplayName -and `
+                    $_.manufacturer -eq $AppJson.Information.Publisher
+            }
+        }
+        catch {
+            Write-Warning -Message "Failed to cast version number: $($_.Exception.Message)"
         }
 
         # Fall back to a direct string comparison
