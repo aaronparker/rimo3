@@ -234,7 +234,7 @@ process {
                 # Create tags
                 $Tags = [System.Collections.ArrayList]::new()
                 [void]$Tags.Add('Evergreen')
-                [void]$Tags.Add($AppJson.Information.Publisher)
+                #[void]$Tags.Add($AppJson.Information.Publisher)
 
                 try {
                     $params = @{
