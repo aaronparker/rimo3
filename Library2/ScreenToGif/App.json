@@ -1,53 +1,53 @@
 {
-    "Application": {
-        "Name": "ScreenToGif",
-        "Filter": "Get-EvergreenAppFromApi -Name \"ScreenToGif\" | Where-Object { $_.Architecture -eq \"x64\" -and $_.Type -eq \"msix\" } | Select-Object -First 1",
-        "Title": "ScreenToGif",
-        "Language": "en-US",
-        "Architecture": "x64"
-    },
-    "PackageInformation": {
-        "SetupType": "MSIX",
-        "SetupFile": "ScreenToGif.2.41.Package.x86.msix",
-        "Version": "2.41",
-        "SourceFolder": "Source",
-        "OutputFolder": "Package",
-        "IconFile": "https://github.com/aaronparker/icons/raw/main/companyportal/Audacity.png"
-    },
-    "Information": {
-        "DisplayName": "ScreenToGif 2.41 x64",
-        "Description": "Screen, webcam and sketch board recorder with an integrated editor.",
-        "Publisher": "Nicke Manarin",
-        "InformationURL": "https://www.screentogif.com/",
-        "PrivacyURL": "https://github.com/NickeManarin/ScreenToGif",
-        "Categories": [],
-        "PSPackageFactoryGuid": "328af5bc-34e3-4a9e-93eb-398f594388d6"
-    },
-    "Program": {
-        "InstallTemplate": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
-        "InstallCommand": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
-        "UninstallCommand": "\"C:\\Program Files\\Audacity\\unins000.exe\" /VERYSILENT",
-        "InstallExperience": "system",
-        "DeviceRestartBehavior": "basedOnReturnCode",
-        "AllowAvailableUninstall": false
-    },
-    "RequirementRule": {
-        "MinimumRequiredOperatingSystem": "W10_1809",
-        "Architecture": "x64"
-    },
-    "CustomRequirementRule": [],
-    "DetectionRule": [],
-    "Dependencies": [],
-    "Supersedence": [],
-    "Assignments": [
-        {
-            "Type": "AllUsers",
-            "Intent": "available",
-            "Notification": "showAll",
-            "EnableRestartGracePeriod": true,
-            "RestartGracePeriod": 1440,
-            "RestartCountDownDisplay": 15,
-            "RestartNotificationSnooze": 240
-        }
-    ]
+  "Application": {
+    "Name": "ScreenToGif",
+    "Filter": "Get-EvergreenAppFromApi -Name \"ScreenToGif\" | Where-Object { $_.Architecture -eq \"x64\" -and $_.Type -eq \"msix\" } | Select-Object -First 1",
+    "Title": "ScreenToGif",
+    "Language": "en-US",
+    "Architecture": "x64"
+  },
+  "PackageInformation": {
+    "SetupType": "MSIX",
+    "SetupFile": "ScreenToGif.2.41.1.Package.x64.msix",
+    "Version": "2.41.1",
+    "SourceFolder": "Source",
+    "OutputFolder": "Package",
+    "IconFile": "https://github.com/aaronparker/icons/raw/main/companyportal/Audacity.png"
+  },
+  "Information": {
+    "DisplayName": "ScreenToGif 2.41.1 x64",
+    "Description": "Screen, webcam and sketch board recorder with an integrated editor.",
+    "Publisher": "Nicke Manarin",
+    "InformationURL": "https://www.screentogif.com/",
+    "PrivacyURL": "https://github.com/NickeManarin/ScreenToGif",
+    "Categories": [],
+    "PSPackageFactoryGuid": "328af5bc-34e3-4a9e-93eb-398f594388d6"
+  },
+  "Program": {
+    "InstallTemplate": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "InstallCommand": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
+    "UninstallCommand": "\"C:\\Program Files\\Audacity\\unins000.exe\" /VERYSILENT",
+    "InstallExperience": "system",
+    "DeviceRestartBehavior": "basedOnReturnCode",
+    "AllowAvailableUninstall": false
+  },
+  "RequirementRule": {
+    "MinimumRequiredOperatingSystem": "W10_1809",
+    "Architecture": "x64"
+  },
+  "CustomRequirementRule": [],
+  "DetectionRule": [],
+  "Dependencies": [],
+  "Supersedence": [],
+  "Assignments": [
+    {
+      "Type": "AllUsers",
+      "Intent": "available",
+      "Notification": "showAll",
+      "EnableRestartGracePeriod": true,
+      "RestartGracePeriod": 1440,
+      "RestartCountDownDisplay": 15,
+      "RestartNotificationSnooze": 240
+    }
+  ]
 }
