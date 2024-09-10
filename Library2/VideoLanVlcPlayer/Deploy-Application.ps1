@@ -170,7 +170,7 @@ try {
         $params = @{
             Action     = "Install"
             Path       = $Installer.FullName
-            Parameters = "ALLUSERS=1"
+            Parameters = "ALLUSERS=1 /quiet"
             PassThru   = $true
         }
         Execute-Msi @params

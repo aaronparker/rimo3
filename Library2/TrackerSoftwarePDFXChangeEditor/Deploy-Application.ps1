@@ -170,7 +170,7 @@ try {
         $params = @{
             Action     = "Install"
             Path       = $Installer.FullName
-            Parameters = "SET_AS_DEFAULT=0 VIEW_IN_BROWSERS=0 DESKTOP_SHORTCUTS=0"
+            Parameters = "SET_AS_DEFAULT=0 VIEW_IN_BROWSERS=0 DESKTOP_SHORTCUTS=0 /quiet"
             PassThru   = $true
         }
         Execute-Msi @params

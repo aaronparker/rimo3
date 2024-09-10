@@ -68,7 +68,6 @@ process {
 
         # Create a working directory
         $WorkingDir = Join-Path -Path $Path -ChildPath $($AppJson.Application.Name)
-        if (Test-Path -Path $WorkingDir) { Remove-Item -Path $WorkingDir -Recurse -Force -ErrorAction "SilentlyContinue" }
         New-Item -Path $WorkingDir -ItemType "Directory" -Force -ErrorAction "SilentlyContinue" | Out-Null
         Write-Host "Working directory: $WorkingDir"
 
@@ -79,18 +78,18 @@ process {
 
         # Copy the PSADT files
         Write-Host "Copy PSADT files to: $WorkingDir"
-        & "$Env:SystemRoot\System32\robocopy.exe" "$($PsadtSource)\*" $WorkingDir /S /NP /NJH /NJS
+        & "$Env:SystemRoot\System32\robocopy.exe" "$($PsadtSource)" "$($WorkingDir)" /S /NP /NJH /NJS /NFL /NDL
 
         # Copy custom install files
         Write-Host "Copy $($App.FullName) to: $WorkingDir"
-        & "$Env:SystemRoot\System32\robocopy.exe" "$($App.FullName)" $WorkingDir /S /NP /NJH /NJS
+        & "$Env:SystemRoot\System32\robocopy.exe" "$($App.FullName)" "$($WorkingDir)" /S /NP /NJH /NJS /NFL /NDL
 
         Write-Host "Downloading: $($EvergreenApp.URI)"
-        $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath "$WorkingDir\Files" -ErrorAction "Stop"
+        $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath "$($WorkingDir)\Files" -ErrorAction "Stop"
         Write-Host "Saved file: $($OutFile.FullName)"
 
         if (Test-Path -Path $OutFile.FullName) {
-            if ($OutFile.FullName -match "\.zip") {
+            if ($OutFile.FullName -match "\.zip$") {
                 # Extract the downloaded installer
                 Write-Host "Expand zip: $($OutFile.FullName)"
                 Expand-Archive -Path $OutFile.FullName -Destination $WorkingDir -Force
