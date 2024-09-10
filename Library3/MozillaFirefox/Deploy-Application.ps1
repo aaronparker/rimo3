@@ -169,7 +169,7 @@ try {
         # Install the application
         $params = @{
             Path       = $Installer.FullName
-            Parameters = "DESKTOP_SHORTCUT=false TASKBAR_SHORTCUT=false"
+            Parameters = "DESKTOP_SHORTCUT=false TASKBAR_SHORTCUT=false /quiet"
             PassThru   = $true
         }
         Execute-Process @params
