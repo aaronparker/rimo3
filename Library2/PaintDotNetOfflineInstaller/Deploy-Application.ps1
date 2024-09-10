@@ -163,6 +163,7 @@ try {
         [System.String] $InstallPhase = 'Installation'
 
         # Get the installer file specified in the App.json
+        Push-Location -Path $dirFiles
         $Installer = Get-ChildItem -Path $AppJson.PackageInformation.SetupFile -Recurse
 
         # Install the application
@@ -173,6 +174,7 @@ try {
             PassThru   = $true
         }
         Execute-Msi @params
+        Pop-Location
 
 
         ##*===============================================

@@ -163,6 +163,7 @@ try {
         [System.String] $InstallPhase = 'Installation'
 
         # Get the installer file specified in the App.json
+        Push-Location -Path $dirFiles
         $Installer = Get-ChildItem -Path $AppJson.PackageInformation.SetupFile -Recurse
 
         # Install the application
@@ -177,6 +178,7 @@ try {
         Remove-File -Path "$Env:ProgramData\Microsoft\Windows\Start Menu\Programs\VideoLAN\VLC\Release Notes.lnk"
         Remove-File -Path "$Env:ProgramData\Microsoft\Windows\Start Menu\Programs\VideoLAN\VLC\Documentation.lnk"
         Remove-File -Path "$Env:Public\Desktop\VLC media player.lnk"
+        Pop-Location
 
 
         ##*===============================================

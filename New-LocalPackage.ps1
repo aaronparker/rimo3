@@ -94,27 +94,6 @@ process {
                 Expand-Archive -Path $OutFile.FullName -Destination $WorkingDir -Force
                 Remove-Item -Path $OutFile.FullName -Force
             }
-
-            if (Test-Path -Path "$($App.FullName)\Source\Install.json") {
-                # Copy supporting files
-                Write-Host "Copy installation wrapper and supporting files"
-                Copy-Item -Path "$($App.FullName)\Source\Install.json" -Destination "$WorkingDir\Install.json"
-                if (Test-Path -Path "$($App.FullName)\Install.ps1") {
-                    Copy-Item -Path "$($App.FullName)\Install.ps1" -Destination "$WorkingDir\Install.ps1"
-                }
-                else {
-                    Copy-Item -Path "$Library\Install.ps1" -Destination "$WorkingDir\Install.ps1"
-                }
-
-                # Read the install.json file
-                Write-Host "Build install argument list"
-                $Install = Get-Content -Path "$($App.FullName)\Source\Install.json" | ConvertFrom-Json
-                $ArgumentList = $Install.InstallTasks.ArgumentList -replace "#SetupFile", $AppJson.PackageInformation.SetupFile
-                $ArgumentList = $ArgumentList -replace "#LogName", $AppJson.PackageInformation.SetupFile
-                $ArgumentList = $ArgumentList -replace "#LogPath", "$Env:SystemRoot\Logs"
-                Write-Host "Setup file: $($AppJson.PackageInformation.SetupFile)"
-                Write-Host "Argument list: $ArgumentList"
-            }
         }
         else {
             Write-Warning -Message "File not found: $($OutFile.FullName)"

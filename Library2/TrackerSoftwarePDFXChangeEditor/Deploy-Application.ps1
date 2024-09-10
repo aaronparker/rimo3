@@ -163,6 +163,7 @@ try {
         [System.String] $InstallPhase = 'Installation'
 
         # Get the installer file specified in the App.json
+        Push-Location -Path $dirFiles
         $Installer = Get-ChildItem -Path $AppJson.PackageInformation.SetupFile -Recurse
 
         # Install the application
@@ -175,7 +176,7 @@ try {
         Execute-Msi @params
         Remove-File -Path "$Env:ProgramData\Microsoft\Windows\Start Menu\Programs\Tracker Software\PDF-XChange Editor" -ContinueOnError:$true
         Remove-File -Path "$Env:ProgramData\Microsoft\Windows\Start Menu\Programs\Tracker Software\PDF-XChange Lite" -ContinueOnError:$true
-
+        Pop-Location
 
         ##*===============================================
         ##* POST-INSTALLATION
