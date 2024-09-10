@@ -48,6 +48,7 @@ begin {
     # Download the PSADT
     Write-Host "Download PSAppDeployToolkit"
     $PsadtDir = Join-Path -Path $Path "psadt"
+    Remove-Item -Path $PsadtDir -Recurse -Force -ErrorAction "SilentlyContinue"
     New-Item -Path $PsadtDir -ItemType "Directory" -Force -ErrorAction "SilentlyContinue" | Out-Null
     $File = Get-EvergreenApp -Name "PSAppDeployToolkit" | Save-EvergreenApp -LiteralPath $PsadtDir -ErrorAction "Stop"
     Expand-Archive -Path $File.FullName -DestinationPath $PsadtDir
@@ -78,11 +79,11 @@ process {
 
         # Copy the PSADT files
         Write-Host "Copy PSADT files to: $WorkingDir"
-        Copy-Item -Path "$PsadtSource\*" -Destination $WorkingDir -Recurse -Force
-        Write-Host "Copy $("$($App.FullName)\Deploy-Application.ps1") to: $("$WorkingDir\Deploy-Application.ps1")"
-        Copy-Item -Path "$($App.FullName)\Deploy-Application.ps1" -Destination "$WorkingDir\Deploy-Application.ps1"
-        Write-Host "Copy $("$($App.FullName)\App.json") to: $("$WorkingDir\App.json")"
-        Copy-Item -Path "$($App.FullName)\App.json" -Destination "$WorkingDir\App.json"
+        & "$Env:SystemRoot\System32\robocopy.exe" "$($PsadtSource)\*" $WorkingDir /S /NP /NJH /NJS
+
+        # Copy custom install files
+        Write-Host "Copy $($App.FullName) to: $WorkingDir"
+        & "$Env:SystemRoot\System32\robocopy.exe" "$($App.FullName)" $WorkingDir /S /NP /NJH /NJS
 
         Write-Host "Downloading: $($EvergreenApp.URI)"
         $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath "$WorkingDir\Files" -ErrorAction "Stop"
