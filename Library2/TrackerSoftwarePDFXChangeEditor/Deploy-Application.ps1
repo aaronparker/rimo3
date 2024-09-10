@@ -130,7 +130,7 @@ try {
     ##* Do not modify section above
 
     # Read App.json to get details for the app
-    $AppJson = Get-Content -Path "$ScriptDirectory\App.json" | ConvertFrom-Json -Depth 10
+    $AppJson = Get-Content -Path "$ScriptDirectory\App.json" | ConvertFrom-Json
 
     ## Variables: Application
     [System.String] $AppVendor = $AppJson.Information.Publisher

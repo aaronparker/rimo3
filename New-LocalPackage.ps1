@@ -81,13 +81,14 @@ process {
         Copy-Item -Path "$PsadtSource\*" -Destination $WorkingDir -Recurse -Force
         Write-Host "Copy $("$($App.FullName)\Deploy-Application.ps1") to: $("$WorkingDir\Deploy-Application.ps1")"
         Copy-Item -Path "$($App.FullName)\Deploy-Application.ps1" -Destination "$WorkingDir\Deploy-Application.ps1"
+        Write-Host "Copy $("$($App.FullName)\App.json") to: $("$WorkingDir\App.json")"
+        Copy-Item -Path "$($App.FullName)\App.json" -Destination "$WorkingDir\App.json"
 
         Write-Host "Downloading: $($EvergreenApp.URI)"
         $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath "$WorkingDir\Files" -ErrorAction "Stop"
         Write-Host "Saved file: $($OutFile.FullName)"
 
         if (Test-Path -Path $OutFile.FullName) {
-
             if ($OutFile.FullName -match "\.zip") {
                 # Extract the downloaded installer
                 Write-Host "Expand zip: $($OutFile.FullName)"
