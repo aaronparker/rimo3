@@ -264,7 +264,7 @@ process {
                             "installCommand"   = $AppJson.Program.InstallCommand
                             "uninstallCommand" = $AppJson.Program.UninstallCommand
                             "tags"             = $Tags
-                            "progressStep"     = "3"
+                            "progressStep"     = "2"
                         }
                         ContentType     = "multipart/form-data"
                         UseBasicParsing = $true
