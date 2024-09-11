@@ -92,7 +92,7 @@ process {
             if ($OutFile.FullName -match "\.zip$") {
                 # Extract the downloaded installer
                 Write-Host "Expand zip: $($OutFile.FullName)"
-                Expand-Archive -Path $OutFile.FullName -Destination $WorkingDir -Force
+                Expand-Archive -Path $OutFile.FullName -Destination "$WorkingDir\Files" -Force
                 Remove-Item -Path $OutFile.FullName -Force
             }
         }
