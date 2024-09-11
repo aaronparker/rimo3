@@ -180,11 +180,19 @@ process {
         if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
             Write-Host "Package not found in Rimo3. Importing: $($AppJson.Information.DisplayName)"
 
+            # # Copy the PSADT files
+            # Write-Host "Copy PSADT files to: $WorkingDir"
+            # Copy-Item -Path "$PsadtSource\*" -Destination $WorkingDir -Recurse -Force
+            # Write-Host "Copy $("$($App.FullName)\Deploy-Application.ps1") to: $("$WorkingDir\Deploy-Application.ps1")"
+            # Copy-Item -Path "$($App.FullName)\Deploy-Application.ps1" -Destination "$WorkingDir\Deploy-Application.ps1"
+
             # Copy the PSADT files
             Write-Host "Copy PSADT files to: $WorkingDir"
-            Copy-Item -Path "$PsadtSource\*" -Destination $WorkingDir -Recurse -Force
-            Write-Host "Copy $("$($App.FullName)\Deploy-Application.ps1") to: $("$WorkingDir\Deploy-Application.ps1")"
-            Copy-Item -Path "$($App.FullName)\Deploy-Application.ps1" -Destination "$WorkingDir\Deploy-Application.ps1"
+            & "$Env:SystemRoot\System32\robocopy.exe" "$($PsadtSource)" "$($WorkingDir)" /S /NP /NJH /NJS /NFL /NDL /R:0 /W:0
+
+            # Copy custom install files
+            Write-Host "Copy $($App.FullName) to: $WorkingDir"
+            & "$Env:SystemRoot\System32\robocopy.exe" "$($App.FullName)" "$($WorkingDir)" /S /NP /NJH /NJS /NFL /NDL
 
             Write-Host "Downloading: $($EvergreenApp.URI)"
             $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath "$WorkingDir\Files" -ErrorAction "Stop"
@@ -195,30 +203,30 @@ process {
                 if ($OutFile.FullName -match "\.zip") {
                     # Extract the downloaded installer
                     Write-Host "Expand zip: $($OutFile.FullName)"
-                    Expand-Archive -Path $OutFile.FullName -Destination $WorkingDir -Force
+                    Expand-Archive -Path $OutFile.FullName -Destination "$WorkingDir\Files" -Force
                     Remove-Item -Path $OutFile.FullName -Force
                 }
 
-                if (Test-Path -Path "$($App.FullName)\Source\Install.json") {
-                    # Copy supporting files
-                    Write-Host "Copy installation wrapper and supporting files"
-                    Copy-Item -Path "$($App.FullName)\Source\Install.json" -Destination "$WorkingDir\Install.json"
-                    if (Test-Path -Path "$($App.FullName)\Install.ps1") {
-                        Copy-Item -Path "$($App.FullName)\Install.ps1" -Destination "$WorkingDir\Install.ps1"
-                    }
-                    else {
-                        Copy-Item -Path "$Library\Install.ps1" -Destination "$WorkingDir\Install.ps1"
-                    }
+                # if (Test-Path -Path "$($App.FullName)\Source\Install.json") {
+                #     # Copy supporting files
+                #     Write-Host "Copy installation wrapper and supporting files"
+                #     Copy-Item -Path "$($App.FullName)\Source\Install.json" -Destination "$WorkingDir\Install.json"
+                #     if (Test-Path -Path "$($App.FullName)\Install.ps1") {
+                #         Copy-Item -Path "$($App.FullName)\Install.ps1" -Destination "$WorkingDir\Install.ps1"
+                #     }
+                #     else {
+                #         Copy-Item -Path "$Library\Install.ps1" -Destination "$WorkingDir\Install.ps1"
+                #     }
 
-                    # Read the install.json file
-                    Write-Host "Build install argument list"
-                    $Install = Get-Content -Path "$($App.FullName)\Source\Install.json" | ConvertFrom-Json
-                    $ArgumentList = $Install.InstallTasks.ArgumentList -replace "#SetupFile", $AppJson.PackageInformation.SetupFile
-                    $ArgumentList = $ArgumentList -replace "#LogName", $AppJson.PackageInformation.SetupFile
-                    $ArgumentList = $ArgumentList -replace "#LogPath", "$Env:SystemRoot\Logs"
-                    Write-Host "Setup file: $($AppJson.PackageInformation.SetupFile)"
-                    Write-Host "Argument list: $ArgumentList"
-                }
+                #     # Read the install.json file
+                #     Write-Host "Build install argument list"
+                #     $Install = Get-Content -Path "$($App.FullName)\Source\Install.json" | ConvertFrom-Json
+                #     $ArgumentList = $Install.InstallTasks.ArgumentList -replace "#SetupFile", $AppJson.PackageInformation.SetupFile
+                #     $ArgumentList = $ArgumentList -replace "#LogName", $AppJson.PackageInformation.SetupFile
+                #     $ArgumentList = $ArgumentList -replace "#LogPath", "$Env:SystemRoot\Logs"
+                #     Write-Host "Setup file: $($AppJson.PackageInformation.SetupFile)"
+                #     Write-Host "Argument list: $ArgumentList"
+                # }
 
                 # Compress the downloaded installers and supporting files
                 Write-Host "Compress zip: $(Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")"
@@ -256,7 +264,7 @@ process {
                             "installCommand"   = $AppJson.Program.InstallCommand
                             "uninstallCommand" = $AppJson.Program.UninstallCommand
                             "tags"             = $Tags
-                            "progressStep"     = "2"
+                            "progressStep"     = "3"
                         }
                         ContentType     = "multipart/form-data"
                         UseBasicParsing = $true
