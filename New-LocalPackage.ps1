@@ -78,7 +78,7 @@ process {
 
         # Copy the PSADT files
         Write-Host "Copy PSADT files to: $WorkingDir"
-        & "$Env:SystemRoot\System32\robocopy.exe" "$($PsadtSource)" "$($WorkingDir)" /S /NP /NJH /NJS /NFL /NDL
+        & "$Env:SystemRoot\System32\robocopy.exe" "$($PsadtSource)" "$($WorkingDir)" /S /NP /NJH /NJS /NFL /NDL /R:0 /W:0
 
         # Copy custom install files
         Write-Host "Copy $($App.FullName) to: $WorkingDir"
