@@ -197,7 +197,7 @@ try {
         ##*==============================================================================================
         [System.String] $InstallPhase = 'Uninstallation'
 
-        Execute-Process -Path "$Env:ProgramFiles\Notepad++\uninstall.exe" -Parameters '/S' -ContinueOnError
+        Execute-Process -Path "$Env:ProgramFiles\Notepad++\uninstall.exe" -Parameters '/S' -ContinueOnError:$true
 
         ##*===============================================
         ##* POST-UNINSTALLATION
