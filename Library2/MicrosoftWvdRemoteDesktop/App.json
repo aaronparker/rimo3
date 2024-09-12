@@ -24,9 +24,9 @@
     "PSPackageFactoryGuid": "a32b45f9-05dd-4f55-9992-118c40b3404d"
   },
   "Program": {
-    "InstallTemplate": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
-    "InstallCommand": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File .\\Install.ps1",
-    "UninstallCommand": "msiexec.exe /X \"{435AF226-840F-49ED-8F03-4B1356F7740F}\" /quiet",
+    "InstallTemplate": "Deploy-Application.exe -DeploymentType 'Install' -DeployMode 'Silent'",
+    "InstallCommand": "Deploy-Application.exe -DeploymentType 'Install' -DeployMode 'Silent'",
+    "UninstallCommand": "Deploy-Application.exe -DeploymentType 'Uninstall' -DeployMode 'Silent'",
     "InstallExperience": "system",
     "DeviceRestartBehavior": "suppress",
     "AllowAvailableUninstall": false

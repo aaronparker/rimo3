@@ -24,7 +24,7 @@
     "PSPackageFactoryGuid": "f0c70a2c-6616-4ec3-a203-895e0f15d18a"
   },
   "Program": {
-    "InstallTemplate": "Deploy-Application.exe -DeploymentType 'Uninstall' -DeployMode 'Silent'",
+    "InstallTemplate": "Deploy-Application.exe -DeploymentType 'Install' -DeployMode 'Silent'",
     "InstallCommand": "Deploy-Application.exe -DeploymentType 'Install' -DeployMode 'Silent'",
     "UninstallCommand": "Deploy-Application.exe -DeploymentType 'Uninstall' -DeployMode 'Silent'",
     "InstallExperience": "system",
