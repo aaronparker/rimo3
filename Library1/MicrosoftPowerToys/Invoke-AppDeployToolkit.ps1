@@ -139,7 +139,7 @@ function Install-ADTDeployment {
         ArgumentList = "/install /quiet /norestart"
         PassThru     = $true
     }
-    Start-ADTProcess -FilePath @params
+    Start-ADTProcess @params
 
 
     ##*===============================================
@@ -169,7 +169,7 @@ function Uninstall-ADTDeployment {
         ArgumentList = "/uninstall /quiet /norestart"
         PassThru     = $true
     }
-    Start-ADTProcess -FilePath @params
+    Start-ADTProcess @params
 
     ##*===============================================
     ##* POST-UNINSTALLATION

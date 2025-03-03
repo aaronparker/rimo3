@@ -139,7 +139,7 @@ function Install-ADTDeployment {
         ArgumentList = "/silent /noreboot /includeSSON /AutoUpdateCheck=auto /AutoUpdateStream=Current /DeferUpdateCount=3 /AURolloutPriority=Auto EnableCEIP=False"
         PassThru     = $true
     }
-    Start-ADTProcess -FilePath @params
+    Start-ADTProcess @params
 
     ##*===============================================
     ##* POST-INSTALLATION
@@ -168,7 +168,7 @@ function Uninstall-ADTDeployment {
         FilePath     = $Uninstaller.FullName
         ArgumentList = '/silent /uninstall /cleanup'
     }
-    Start-ADTProcess -FilePath @params
+    Start-ADTProcess @params
 
     ##*===============================================
     ##* POST-UNINSTALLATION

@@ -139,7 +139,7 @@ function Install-ADTDeployment {
         ArgumentList = "/VERYSILENT /NOCLOSEAPPLICATIONS /NORESTARTAPPLICATIONS /NORESTART /SP- /SUPPRESSMSGBOXES /MERGETASKS=!runcode"
         PassThru     = $true
     }
-    Start-ADTProcess -FilePath @params
+    Start-ADTProcess @params
 
 
     ##*===============================================
@@ -169,7 +169,7 @@ function Uninstall-ADTDeployment {
         ArgumentList = "/SILENT"
         PassThru     = $true
     }
-    Start-ADTProcess -FilePath @params
+    Start-ADTProcess @params
 
     ##*===============================================
     ##* POST-UNINSTALLATION

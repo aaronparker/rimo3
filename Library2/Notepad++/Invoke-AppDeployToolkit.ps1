@@ -139,7 +139,7 @@ function Install-ADTDeployment {
         ArgumentList = "/S"
         PassThru     = $true
     }
-    Start-ADTProcess -FilePath @params
+    Start-ADTProcess @params
 
 
     ##*===============================================

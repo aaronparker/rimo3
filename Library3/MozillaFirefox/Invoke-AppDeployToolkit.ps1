@@ -139,7 +139,7 @@ function Install-ADTDeployment {
         ArgumentList = "DESKTOP_SHORTCUT=false TASKBAR_SHORTCUT=false /quiet"
         PassThru     = $true
     }
-    Start-ADTProcess -FilePath @params
+    Start-ADTProcess @params
 
 
     ##*===============================================

@@ -137,7 +137,7 @@ function Install-ADTDeployment {
         ArgumentList = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- /MERGETASKS=`"!desktopicon`""
         PassThru     = $true
     }
-    Start-ADTProcess -FilePath @params
+    Start-ADTProcess @params
 
     ##*===============================================
     ##* POST-INSTALLATION
