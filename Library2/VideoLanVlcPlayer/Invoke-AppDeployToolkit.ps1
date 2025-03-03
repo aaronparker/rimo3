@@ -135,12 +135,11 @@ function Install-ADTDeployment {
 
     # Install the application
     $params = @{
-        Action       = "Install"
         FilePath     = $Global:Installer.FullName
-        ArgumentList = "ALLUSERS=1 /quiet"
+        ArgumentList = "/L=1033 /S"
         PassThru     = $true
     }
-    Start-ADTMsiProcess @params
+    Start-ADTProcess @params
     Remove-ADTFile -Path "$Env:ProgramData\Microsoft\Windows\Start Menu\Programs\VideoLAN\VLC\VideoLAN website.lnk"
     Remove-ADTFile -Path "$Env:ProgramData\Microsoft\Windows\Start Menu\Programs\VideoLAN\VLC\Release Notes.lnk"
     Remove-ADTFile -Path "$Env:ProgramData\Microsoft\Windows\Start Menu\Programs\VideoLAN\VLC\Documentation.lnk"
