@@ -46,7 +46,7 @@ begin {
     $LibraryItems = Get-ChildItem -Path $Library -Directory -ErrorAction "Stop"
 
     # Install PSAppDeployToolkit module
-    Write-Host "Download PSAppDeployToolkit"
+    Write-Host "Installing PSAppDeployToolkit"
     Install-Module -Name "PSAppDeployToolkit" -RequiredVersion "4.0.6" -Force
 }
 
