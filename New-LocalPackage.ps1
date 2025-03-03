@@ -45,16 +45,9 @@ begin {
     Write-Host "Importing Evergreen library from: $Library"
     $LibraryItems = Get-ChildItem -Path $Library -Directory -ErrorAction "Stop"
 
-    # Download the PSADT
+    # Install PSAppDeployToolkit module
     Write-Host "Download PSAppDeployToolkit"
-    $PsadtDir = Join-Path -Path $Path "psadt"
-    Remove-Item -Path $PsadtDir -Recurse -Force -ErrorAction "SilentlyContinue"
-    New-Item -Path $PsadtDir -ItemType "Directory" -Force -ErrorAction "SilentlyContinue" | Out-Null
-    $File = Get-EvergreenApp -Name "PSAppDeployToolkit" | Save-EvergreenApp -LiteralPath $PsadtDir -ErrorAction "Stop"
-    Expand-Archive -Path $File.FullName -DestinationPath $PsadtDir
-    $PsadtSource = Join-Path -Path $PsadtDir -ChildPath "Toolkit"
-    Remove-Item -Path "$PsadtSource\Deploy-Application.ps1" -Force
-    Remove-Item -Path "$PsadtSource\.vscode" -Recurse -Force
+    Install-Module -Name "PSAppDeployToolkit" -RequiredVersion "4.0.6" -Force
 }
 
 process {
@@ -76,9 +69,15 @@ process {
         $EvergreenApp = Invoke-Expression -Command $AppJson.Application.Filter
         Write-Host "Evergreen found version: $($EvergreenApp.Version)"
 
-        # Copy the PSADT files
-        Write-Host "Copy PSADT files to: $WorkingDir"
-        & "$Env:SystemRoot\System32\robocopy.exe" "$($PsadtSource)" "$($WorkingDir)" /S /NP /NJH /NJS /NFL /NDL /R:0 /W:0
+        # Create a PSADT template
+        Write-Host "Create PSADT template"
+        New-ADTTemplate -Destination $WorkingDir
+        $AdtTemplatePath = Get-ChildItem -Path $WorkingDir -Filter "Invoke-AppDeployToolkit.exe" -Recurse -Depth 1
+
+        # Update WorkingDir
+        $WorkingDir = $AdtTemplatePath.DirectoryName
+        Write-Host "Update working directory to: $WorkingDir"
+        Remove-Item -Path "$WorkingDir\Invoke-AppDeployToolkit.ps1" -Force
 
         # Copy custom install files
         Write-Host "Copy $($App.FullName) to: $WorkingDir"
