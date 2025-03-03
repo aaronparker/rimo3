@@ -92,7 +92,7 @@ param
 ##================================================
 
 # Read App.json to get details for the app
-$AppJson = Get-Content -Path "$ScriptDirectory\App.json" | ConvertFrom-Json
+$AppJson = Get-Content -Path "$PSScriptRoot\App.json" | ConvertFrom-Json
 
 # Get the installer file specified in the App.json
 $Global:Installer = Get-ChildItem -Path $AppJson.PackageInformation.SetupFile -Recurse
