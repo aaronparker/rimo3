@@ -94,6 +94,9 @@ param
 # Read App.json to get details for the app
 $AppJson = Get-Content -Path "$ScriptDirectory\App.json" | ConvertFrom-Json
 
+# Get the installer file specified in the App.json
+$Global:Installer = Get-ChildItem -Path $AppJson.PackageInformation.SetupFile -Recurse
+
 $adtSession = @{
     # App variables.
     AppVendor                   = $AppJson.Information.Publisher
@@ -130,14 +133,10 @@ function Install-ADTDeployment {
     ##*===============================================
     [System.String] $adtSession.InstallPhase = 'Installation'
 
-    # Get the installer file specified in the App.json
-    Push-Location -Path $adtSession.DirFiles
-    $Installer = Get-ChildItem -Path $AppJson.PackageInformation.SetupFile -Recurse
-
     # Install the application
     $params = @{
         Action       = "Install"
-        FilePath     = $Installer.FullName
+        FilePath     = $Global:Installer.FullName
         ArgumentList = "ALLUSERS=1 /quiet"
         PassThru     = $true
     }
@@ -146,7 +145,6 @@ function Install-ADTDeployment {
     Remove-ADTFile -Path "$Env:ProgramData\Microsoft\Windows\Start Menu\Programs\VideoLAN\VLC\Release Notes.lnk"
     Remove-ADTFile -Path "$Env:ProgramData\Microsoft\Windows\Start Menu\Programs\VideoLAN\VLC\Documentation.lnk"
     Remove-ADTFile -Path "$Env:Public\Desktop\VLC media player.lnk"
-    Pop-Location
 
 
     ##*===============================================

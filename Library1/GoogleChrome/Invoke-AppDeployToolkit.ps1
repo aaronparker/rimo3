@@ -94,6 +94,10 @@ param
 # Read App.json to get details for the app
 $AppJson = Get-Content -Path "$ScriptDirectory\App.json" | ConvertFrom-Json
 
+# Get the installer file specified in the App.json
+Push-Location -Path $adtSession.DirFiles
+$Global:Installer = Get-ChildItem -Path $AppJson.PackageInformation.SetupFile -Recurse
+
 $adtSession = @{
     # App variables.
     AppVendor                   = $AppJson.Information.Publisher
@@ -137,7 +141,7 @@ function Install-ADTDeployment {
     # Install the application
     $params = @{
         Action       = "Install"
-        FilePath     = $Installer.FullName
+        FilePath     = $Global:Installer.FullName
         ArgumentList = "ALLUSERS=1 REBOOT=ReallySuppress /quiet"
         PassThru     = $true
     }

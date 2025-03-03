@@ -91,6 +91,12 @@ param
 ## MARK: Variables
 ##================================================
 
+# Read App.json to get details for the app
+$AppJson = Get-Content -Path "$ScriptDirectory\App.json" | ConvertFrom-Json
+
+# Get the installer file specified in the App.json
+$Global:Installer = Get-ChildItem -Path $AppJson.PackageInformation.SetupFile -Recurse
+
 $adtSession = @{
     # App variables.
     AppVendor                   = 'Cyberduck'
@@ -126,9 +132,8 @@ function Install-ADTDeployment {
     ##*===============================================
     $adtSession.InstallPhase = $adtSession.DeploymentType
 
-    $Installer = Get-ChildItem -Path "Cyberduck-Installer*.exe" -Recurse
     $params = @{
-        FilePath     = $Installer.FullName
+        FilePath     = $Global:Installer.FullName
         ArgumentList = "/quiet /norestart"
         PassThru     = $true
     }
