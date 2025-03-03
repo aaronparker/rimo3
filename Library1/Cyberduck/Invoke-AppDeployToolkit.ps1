@@ -93,105 +93,102 @@ param
 
 $adtSession = @{
     # App variables.
-    AppVendor = 'Cyberduck'
-    AppName = 'Cyberduck'
-    AppVersion = '9.0.1.41941'
-    AppArch = 'x64'
-    AppLang = 'EN'
-    AppRevision = '01'
-    AppSuccessExitCodes = @(0)
-    AppRebootExitCodes = @(1641, 3010)
-    AppScriptVersion = '1.0.0'
-    AppScriptDate = '2025-02-26'
-    AppScriptAuthor = 'Aaron Parker'
+    AppVendor                   = 'Cyberduck'
+    AppName                     = 'Cyberduck'
+    AppVersion                  = '9.0.1.41941'
+    AppArch                     = 'x64'
+    AppLang                     = 'EN'
+    AppRevision                 = '01'
+    AppSuccessExitCodes         = @(0)
+    AppRebootExitCodes          = @(1641, 3010)
+    AppScriptVersion            = '1.0.0'
+    AppScriptDate               = '2025-02-26'
+    AppScriptAuthor             = 'Aaron Parker'
 
     # Install Titles (Only set here to override defaults set by the toolkit).
-    InstallName = ''
-    InstallTitle = ''
+    InstallName                 = ''
+    InstallTitle                = ''
 
     # Script variables.
     DeployAppScriptFriendlyName = $MyInvocation.MyCommand.Name
-    DeployAppScriptVersion = '4.0.6'
-    DeployAppScriptParameters = $PSBoundParameters
+    DeployAppScriptVersion      = '4.0.6'
+    DeployAppScriptParameters   = $PSBoundParameters
 }
 
-function Install-ADTDeployment
-{
-        ##*===============================================
-        ##* PRE-INSTALLATION
-        ##*===============================================
-        $adtSession.InstallPhase = "Pre-$($adtSession.DeploymentType)"
+function Install-ADTDeployment {
+    ##*===============================================
+    ##* PRE-INSTALLATION
+    ##*===============================================
+    $adtSession.InstallPhase = "Pre-$($adtSession.DeploymentType)"
 
-        ##*===============================================
-        ##* INSTALLATION
-        ##*===============================================
-        $adtSession.InstallPhase = $adtSession.DeploymentType
+    ##*===============================================
+    ##* INSTALLATION
+    ##*===============================================
+    $adtSession.InstallPhase = $adtSession.DeploymentType
 
-        $Installer = Get-ChildItem -Path "Cyberduck-Installer*.exe" -Recurse
-        $params = @{
-            FilePath = $Installer.FullName
-            ArgumentList = "/quiet /norestart"
-            PassThru = $true
-        }
-        Start-ADTProcess -FilePath @params
-
-        ##*===============================================
-        ##* POST-INSTALLATION
-        ##*===============================================
-        $adtSession.InstallPhase = "Post-$($adtSession.DeploymentType)"
-
-        ## Master Wrapper detection
-        Set-ADTRegistryKey -Key "HKLM\SOFTWARE\InstalledApps\iterate_Cyberduck_9.0.1.41941"
+    $Installer = Get-ChildItem -Path "Cyberduck-Installer*.exe" -Recurse
+    $params = @{
+        FilePath     = $Installer.FullName
+        ArgumentList = "/quiet /norestart"
+        PassThru     = $true
     }
+    Start-ADTProcess -FilePath @params
 
-function Uninstall-ADTDeployment
-{
-        ##*===============================================
-        ##* PRE-UNINSTALLATION
-        ##*===============================================
-        $adtSession.InstallPhase = "Pre-$($adtSession.DeploymentType)"
+    ##*===============================================
+    ##* POST-INSTALLATION
+    ##*===============================================
+    $adtSession.InstallPhase = "Post-$($adtSession.DeploymentType)"
 
-        ##*===============================================
-        ##* UNINSTALLATION
-        ##*===============================================
-        $adtSession.InstallPhase = $adtSession.DeploymentType
+    ## Master Wrapper detection
+    Set-ADTRegistryKey -Key "HKLM\SOFTWARE\InstalledApps\iterate_Cyberduck_9.0.1.41941"
+}
 
-        $params = @{
-            FilePath = "$Env:ProgramData\Package Cache\{fa750125-8efe-41ab-8515-51bdbca09555}\Cyberduck-Installer-9.0.1.41941.exe"
-            ArgumentList = "/uninstall /quiet /norestart"
-            PassThru = $true
-        }
-        Start-ADTProcess -FilePath @params
+function Uninstall-ADTDeployment {
+    ##*===============================================
+    ##* PRE-UNINSTALLATION
+    ##*===============================================
+    $adtSession.InstallPhase = "Pre-$($adtSession.DeploymentType)"
 
-        ##*===============================================
-        ##* POST-UNINSTALLATION
-        ##*===============================================
-        $adtSession.InstallPhase = "Post-$($adtSession.DeploymentType)"
+    ##*===============================================
+    ##* UNINSTALLATION
+    ##*===============================================
+    $adtSession.InstallPhase = $adtSession.DeploymentType
 
-        ## Master Wrapper detection
-        Remove-ADTRegistryKey -Key "HKLM\SOFTWARE\InstalledApps\iterate_Cyberduck_9.0.1.41941"
+    $params = @{
+        FilePath     = "$Env:ProgramData\Package Cache\{fa750125-8efe-41ab-8515-51bdbca09555}\Cyberduck-Installer-9.0.1.41941.exe"
+        ArgumentList = "/uninstall /quiet /norestart"
+        PassThru     = $true
     }
+    Start-ADTProcess -FilePath @params
 
-function Repair-ADTDeployment
-{
-        ##*===============================================
-        ##* PRE-REPAIR
-        ##*===============================================
-        $adtSession.InstallPhase = "Pre-$($adtSession.DeploymentType)"
+    ##*===============================================
+    ##* POST-UNINSTALLATION
+    ##*===============================================
+    $adtSession.InstallPhase = "Post-$($adtSession.DeploymentType)"
 
-        ##*===============================================
-        ##* REPAIR
-        ##*===============================================
-        $adtSession.InstallPhase = $adtSession.DeploymentType
+    ## Master Wrapper detection
+    Remove-ADTRegistryKey -Key "HKLM\SOFTWARE\InstalledApps\iterate_Cyberduck_9.0.1.41941"
+}
 
-        ##*===============================================
-        ##* POST-REPAIR
-        ##*===============================================
-        $adtSession.InstallPhase = "Post-$($adtSession.DeploymentType)"
+function Repair-ADTDeployment {
+    ##*===============================================
+    ##* PRE-REPAIR
+    ##*===============================================
+    $adtSession.InstallPhase = "Pre-$($adtSession.DeploymentType)"
 
-        ## Master Wrapper detection
-        Set-ADTRegistryKey -Key "HKLM\SOFTWARE\InstalledApps\iterate_Cyberduck_9.0.1.41941"
-    }
+    ##*===============================================
+    ##* REPAIR
+    ##*===============================================
+    $adtSession.InstallPhase = $adtSession.DeploymentType
+
+    ##*===============================================
+    ##* POST-REPAIR
+    ##*===============================================
+    $adtSession.InstallPhase = "Post-$($adtSession.DeploymentType)"
+
+    ## Master Wrapper detection
+    Set-ADTRegistryKey -Key "HKLM\SOFTWARE\InstalledApps\iterate_Cyberduck_9.0.1.41941"
+}
 
 
 ##================================================
@@ -204,31 +201,25 @@ $ProgressPreference = [System.Management.Automation.ActionPreference]::SilentlyC
 Set-StrictMode -Version 1
 
 # Import the module and instantiate a new session.
-try
-{
-    $moduleName = if ([System.IO.File]::Exists("$PSScriptRoot\PSAppDeployToolkit\PSAppDeployToolkit.psd1"))
-    {
+try {
+    $moduleName = if ([System.IO.File]::Exists("$PSScriptRoot\PSAppDeployToolkit\PSAppDeployToolkit.psd1")) {
         Get-ChildItem -LiteralPath $PSScriptRoot\PSAppDeployToolkit -Recurse -File | Unblock-File -ErrorAction Ignore
         "$PSScriptRoot\PSAppDeployToolkit\PSAppDeployToolkit.psd1"
     }
-    else
-    {
+    else {
         'PSAppDeployToolkit'
     }
     Import-Module -FullyQualifiedName @{ ModuleName = $moduleName; Guid = '8c3c366b-8606-4576-9f2d-4051144f7ca2'; ModuleVersion = '4.0.6' } -Force
-    try
-    {
+    try {
         $iadtParams = Get-ADTBoundParametersAndDefaultValues -Invocation $MyInvocation
         $adtSession = Open-ADTSession -SessionState $ExecutionContext.SessionState @adtSession @iadtParams -PassThru
     }
-    catch
-    {
+    catch {
         Remove-Module -Name PSAppDeployToolkit* -Force
         throw
     }
 }
-catch
-{
+catch {
     $Host.UI.WriteErrorLine((Out-String -InputObject $_ -Width ([System.Int32]::MaxValue)))
     exit 60008
 }
@@ -238,11 +229,9 @@ catch
 ## MARK: Invocation
 ##================================================
 
-try
-{
+try {
     Get-Item -Path $PSScriptRoot\PSAppDeployToolkit.* | & {
-        process
-        {
+        process {
             Get-ChildItem -LiteralPath $_.FullName -Recurse -File | Unblock-File -ErrorAction Ignore
             Import-Module -Name $_.FullName -Force
         }
@@ -250,13 +239,11 @@ try
     & "$($adtSession.DeploymentType)-ADTDeployment"
     Close-ADTSession
 }
-catch
-{
+catch {
     Write-ADTLogEntry -Message ($mainErrorMessage = Resolve-ADTErrorRecord -ErrorRecord $_) -Severity 3
     Show-ADTDialogBox -Text $mainErrorMessage -Icon Stop | Out-Null
     Close-ADTSession -ExitCode 60001
 }
-finally
-{
+finally {
     Remove-Module -Name PSAppDeployToolkit* -Force
 }
