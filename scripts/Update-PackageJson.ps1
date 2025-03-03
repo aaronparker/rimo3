@@ -12,7 +12,7 @@ param (
     [System.String] $Path = $PWD,
 
     [Parameter()]
-    [System.String[]] $PackageFolder = @("Library1", "Library2"),
+    [System.String[]] $PackageFolder = @("Library1", "Library2", "Library3"),
 
     [Parameter()]
     [System.String] $PackageManifest = "App.json",
