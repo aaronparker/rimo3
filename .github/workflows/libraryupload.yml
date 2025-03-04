@@ -28,9 +28,9 @@ jobs:
 
         - name: Install and cache PowerShell modules
           id: psmodulecache
-          uses: potatoqualitee/psmodulecache
+          uses: potatoqualitee/psmodulecache@v6.2.1
           with:
-            modules-to-cache: "Evergreen::, VcRedist::, PSAppDeployToolkit::"
+            modules-to-cache: "Evergreen::, VcRedist::, PSAppDeployToolkit:4.0.6"
             updatable: true
             shell: pwsh
 
