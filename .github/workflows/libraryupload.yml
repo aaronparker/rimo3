@@ -13,6 +13,7 @@ on:
         options:
           - Library1
           - Library2
+          - Library3
   # push:
   #   branches: ["main"]
   #   paths:
@@ -27,9 +28,9 @@ jobs:
 
         - name: Install and cache PowerShell modules
           id: psmodulecache
-          uses: potatoqualitee/psmodulecache@v6.2
+          uses: potatoqualitee/psmodulecache
           with:
-            modules-to-cache: "Evergreen::, VcRedist::"
+            modules-to-cache: "Evergreen::, VcRedist::, PSAppDeployToolkit::"
             updatable: true
             shell: pwsh
 
