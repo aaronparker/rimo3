@@ -1,3 +1,4 @@
+#Requires -Modules Evergreen, VcRedist, PSAppDeployToolkit
 <#
     .SYNOPSIS
     Uploads application packages to Rimo3 Cloud.
@@ -56,36 +57,30 @@ param (
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [System.String] $OktaStub,
-
-    [Parameter(Mandatory = $true)]
-    [ValidateNotNullOrEmpty()]
     [System.String] $Path
 )
 
 begin {
     # Import the required modules
-    Import-Module -Name "Evergreen", "VcRedist" -Force
+    Import-Module -Name "Evergreen", "VcRedist", "PSAppDeployToolkit" -Force
 
     # Define constants
-    Set-Variable -Name "Rimo3Url" -Value "https://rimo3cloud.com" -Option "Constant"
-    Set-Variable -Name "RimoPackagesUri" -Value "$Rimo3Url/api/v2/application-packages" -Option "Constant"
+    Set-Variable -Name "Rimo3TokenUri" -Value "https://rimo3cloud.com/api/v2/connect/token" -Option "Constant"
+    Set-Variable -Name "Rimo3BaseUrl" -Value "https://rimo3cloud.com" -Option "Constant"
+    Set-Variable -Name "RimoPackagesUri" -Value "$Rimo3BaseUrl/api/v2/application-packages" -Option "Constant"
     Set-Variable -Name "RimoUploadUri" -Value "$RimoPackagesUri/upload" -Option "Constant"
     Set-Variable -Name "RimoUploadManualUri" -Value "$RimoUploadUri/manual" -Option "Constant"
 
     # Authenticate to the Okta API
     try {
+        $EncodedString = [System.Text.Encoding]::UTF8.GetBytes("${ClientId}:$ClientSecret")
+        $Base64String = [System.Convert]::ToBase64String($EncodedString)
+
         $params = @{
-            Uri             = "https://rimo3.okta.com/oauth2/$($OktaStub)/v1/token"
-            Body            = @{
-                "grant_type"  = "client_credentials"
-                scope         = "access_token"
-                client_id     = $ClientId
-                client_secret = $ClientSecret
-            }
+            Uri             = $Rimo3TokenUri
+            Body            = "{`"Form-Data`": `"grant_type=client_credentials`"}"
             Headers         = @{
-                "Accept"        = "application/json; utf-8"
-                "Content-Type"  = "application/x-www-form-urlencoded"
+                "Authorization" = "Basic $Base64String"
                 "Cache-Control" = "no-cache"
             }
             Method          = "POST"
@@ -121,9 +116,9 @@ begin {
     Write-Host "Importing Evergreen library from: $Library"
     $LibraryItems = Get-ChildItem -Path $Library -Directory -ErrorAction "Stop"
 
-    # Install PSAppDeployToolkit module
-    Write-Host "Installing PSAppDeployToolkit"
-    Install-Module -Name "PSAppDeployToolkit" -RequiredVersion "4.0.6" -Force
+    # # Install PSAppDeployToolkit module
+    # Write-Host "Installing PSAppDeployToolkit"
+    # Install-Module -Name "PSAppDeployToolkit" -RequiredVersion "4.0.6" -Force
 }
 
 process {
