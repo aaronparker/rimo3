@@ -249,7 +249,7 @@ try {
         }
     }
     & "$($adtSession.DeploymentType)-ADTDeployment"
-    Close-ADTSession
+    Close-ADTSession -ExitCode 0
 }
 catch {
     Write-ADTLogEntry -Message ($mainErrorMessage = Resolve-ADTErrorRecord -ErrorRecord $_) -Severity 3
