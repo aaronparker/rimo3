@@ -77,3 +77,4 @@ jobs:
                 ErrorAction  = "Stop"
             }
             & "${{ github.workspace }}\Start-PackageLibraryUpload.ps1" @params
+            exit 0
