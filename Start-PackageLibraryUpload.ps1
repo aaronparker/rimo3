@@ -296,4 +296,5 @@ process {
 }
 
 end {
+    return 0
 }
