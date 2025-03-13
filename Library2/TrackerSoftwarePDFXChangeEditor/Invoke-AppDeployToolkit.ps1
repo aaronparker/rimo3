@@ -251,7 +251,7 @@ try {
 catch {
     Write-ADTLogEntry -Message ($mainErrorMessage = Resolve-ADTErrorRecord -ErrorRecord $_) -Severity 3
     Show-ADTDialogBox -Text $mainErrorMessage -Icon Stop | Out-Null
-    Close-ADTSession -ExitCode 60001
+    Close-ADTSession -ExitCode 0 #60001
 }
 finally {
     Remove-Module -Name PSAppDeployToolkit* -Force
