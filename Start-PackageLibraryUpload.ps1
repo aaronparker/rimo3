@@ -177,17 +177,10 @@ process {
 
             # Create a PSADT template
             Write-Host "Create PSADT template"
-            New-ADTTemplate -Destination $WorkingDir
-            $AdtTemplatePath = Get-ChildItem -Path $WorkingDir -Filter "Invoke-AppDeployToolkit.exe" -Recurse -Depth 1
-
-            # Update WorkingDir
-            $WorkingDir = $AdtTemplatePath.DirectoryName
-            Write-Host "Update working directory to: $WorkingDir"
+            New-ADTTemplate -Destination "$Env:TEMP\psadt" -Force
+            $PsAdtSource = Get-ChildItem -Path "$Env:TEMP\psadt" -Directory -Filter "PSAppDeployToolkit*"
+            Copy-Item -Path "$($PsAdtSource.FullName)\*" -Destination $WorkingDir -Recurse -Force
             Remove-Item -Path "$WorkingDir\Invoke-AppDeployToolkit.ps1" -Force
-
-            # Copy the PSADT files
-            # Write-Host "Copy PSADT files to: $WorkingDir"
-            # & "$Env:SystemRoot\System32\robocopy.exe" "$($PsadtSource)" "$($WorkingDir)" /S /NP /NJH /NJS /NFL /NDL /R:0 /W:0
 
             # Copy custom install files
             Write-Host "Copy $($App.FullName) to: $WorkingDir"

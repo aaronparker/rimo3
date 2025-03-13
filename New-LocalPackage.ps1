@@ -1,3 +1,4 @@
+#Requires -Modules Evergreen, VcRedist, PSAppDeployToolkit
 <#
 .SYNOPSIS
     This script is used to create a new local package using the Evergreen library and the PSAppDeployToolkit.
@@ -46,8 +47,8 @@ begin {
     $LibraryItems = Get-ChildItem -Path $Library -Directory -ErrorAction "Stop"
 
     # Install PSAppDeployToolkit module
-    Write-Host "Installing PSAppDeployToolkit"
-    Install-Module -Name "PSAppDeployToolkit" -RequiredVersion "4.0.6" -Force
+    # Write-Host "Installing PSAppDeployToolkit"
+    # Install-Module -Name "PSAppDeployToolkit" -RequiredVersion "4.0.6" -Force
 }
 
 process {
@@ -71,12 +72,9 @@ process {
 
         # Create a PSADT template
         Write-Host "Create PSADT template"
-        New-ADTTemplate -Destination $WorkingDir
-        $AdtTemplatePath = Get-ChildItem -Path $WorkingDir -Filter "Invoke-AppDeployToolkit.exe" -Recurse -Depth 1
-
-        # Update WorkingDir
-        $WorkingDir = $AdtTemplatePath.DirectoryName
-        Write-Host "Update working directory to: $WorkingDir"
+        New-ADTTemplate -Destination "$Env:TEMP\psadt" -Force
+        $PsAdtSource = Get-ChildItem -Path "$Env:TEMP\psadt" -Directory -Filter "PSAppDeployToolkit*"
+        Copy-Item -Path "$($PsAdtSource.FullName)\*" -Destination $WorkingDir -Recurse -Force
         Remove-Item -Path "$WorkingDir\Invoke-AppDeployToolkit.ps1" -Force
 
         # Copy custom install files
