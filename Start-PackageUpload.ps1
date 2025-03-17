@@ -185,6 +185,9 @@ process {
                     Remove-Item -Path $OutFile.FullName -Force
                 }
 
+                # Remove duplicate PSADT files
+                Remove-Item -Path "$WorkingDir\PSAppDeployToolkit\Frontend\v4\Invoke-AppDeployToolkit.exe" -ErrorAction "SilentlyContinue"
+
                 # if (Test-Path -Path "$($PackagePath.FullName)\Source\Install.json") {
                 #     # Copy supporting files
                 #     Write-Host "Copy installation wrapper and supporting files"

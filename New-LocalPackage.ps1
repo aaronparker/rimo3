@@ -92,6 +92,9 @@ process {
         else {
             Write-Warning -Message "File not found: $($OutFile.FullName)"
         }
+
+        # Remove duplicate PSADT files
+        Remove-Item -Path "$WorkingDir\PSAppDeployToolkit\Frontend\v4\Invoke-AppDeployToolkit.exe" -ErrorAction "SilentlyContinue"
     }
 }
 
