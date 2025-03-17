@@ -8,7 +8,7 @@ param ()
 
 BeforeDiscovery {
     # Get the App.json for each app
-    $Files = Get-ChildItem -Path "./Library1", "./Library2" -Include "App.json" -Recurse -ErrorAction "Stop"
+    $Files = Get-ChildItem -Path "./Library" -Include "App.json" -Recurse -ErrorAction "Stop"
 }
 
 Describe -Name "File - <_>" -ForEach $Files {
