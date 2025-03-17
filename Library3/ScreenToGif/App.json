@@ -24,8 +24,8 @@
     "PSPackageFactoryGuid": "328af5bc-34e3-4a9e-93eb-398f594388d6"
   },
   "Program": {
-    "InstallTemplate": "Invoke-AppDeployToolkit.exe -DeploymentType 'Install' -DeployMode 'Silent'",
-    "InstallCommand": "Invoke-AppDeployToolkit.exe -DeploymentType 'Install' -DeployMode 'Silent'",
+    "InstallTemplate": "Invoke-AppDeployToolkit.exe -DeploymentType Install -DeployMode Silent",
+    "InstallCommand": "Invoke-AppDeployToolkit.exe -DeploymentType Install -DeployMode Silent",
     "UninstallCommand": "\"C:\\Program Files\\Audacity\\unins000.exe\" /VERYSILENT",
     "InstallExperience": "system",
     "DeviceRestartBehavior": "basedOnReturnCode",

@@ -24,9 +24,9 @@
     "PSPackageFactoryGuid": "f0c70a2c-6616-4ec3-a203-895e0f15d18a"
   },
   "Program": {
-    "InstallTemplate": "Invoke-AppDeployToolkit.exe -DeploymentType 'Install' -DeployMode 'Silent'",
-    "InstallCommand": "Invoke-AppDeployToolkit.exe -DeploymentType 'Install' -DeployMode 'Silent'",
-    "UninstallCommand": "Invoke-AppDeployToolkit.exe -DeploymentType 'Uninstall' -DeployMode 'Silent'",
+    "InstallTemplate": "Invoke-AppDeployToolkit.exe -DeploymentType Install -DeployMode Silent",
+    "InstallCommand": "Invoke-AppDeployToolkit.exe -DeploymentType Install -DeployMode Silent",
+    "UninstallCommand": "Invoke-AppDeployToolkit.exe -DeploymentType Uninstall -DeployMode Silent",
     "InstallExperience": "system",
     "DeviceRestartBehavior": "suppress",
     "AllowAvailableUninstall": false
