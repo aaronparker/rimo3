@@ -29,7 +29,7 @@ on:
           - VideoLanVlcPlayer
 
 jobs:
-  upload-library:
+  upload-package:
     runs-on: windows-latest
 
     steps:
@@ -43,8 +43,8 @@ jobs:
             updatable: true
             shell: pwsh
 
-        - name: Import custom library
-          id: import-library2
+        - name: Import package
+          id: import-package
           if: github.event_name == 'workflow_dispatch'
           shell: pwsh
           working-directory: ${{ github.workspace }}
@@ -55,7 +55,8 @@ jobs:
             Import-Module -Name "Evergreen", "VcRedist" -Force
             New-Item -Path "${{ github.workspace }}\working" -ItemType Directory -Force
 
-            # Authenticate to the Okta API and import the library
+            # Authenticate to the API and import the library
+            Write-Host "Processing: ${{ github.workspace }}\Library\${{ github.event.inputs.package }}"
             $params = @{
                 ClientId     = "$env:CLIENT_ID"
                 ClientSecret = "$env:CLIENT_SECRET"

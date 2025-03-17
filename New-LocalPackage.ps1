@@ -47,7 +47,7 @@ process {
     foreach ($App in $Package) {
 
         # Get the package path
-        $PackagePath = Get-ChildItem -Path $Package
+        $PackagePath = Get-ChildItem -Path $App
 
         Write-Host "--"
         Write-Host "Processing directory: $($PackagePath.FullName)" -ForegroundColor "Yellow"
