@@ -29,9 +29,9 @@
 #requires -Modules "Evergreen"
 [CmdletBinding(SupportsShouldProcess = $false)]
 param (
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [System.String] $Library = ".\Library",
+    [System.String[]] $Package,
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
@@ -41,24 +41,20 @@ param (
 begin {
     # Import the required modules
     Import-Module -Name "Evergreen", "VcRedist" -Force
-
-    # Import the Evergreen library
-    Write-Host "Importing Evergreen library from: $Library"
-    $LibraryItems = Get-ChildItem -Path $Library -Directory -ErrorAction "Stop"
-
-    # Install PSAppDeployToolkit module
-    # Write-Host "Installing PSAppDeployToolkit"
-    # Install-Module -Name "PSAppDeployToolkit" -RequiredVersion "4.0.6" -Force
 }
 
 process {
-    foreach ($App in $LibraryItems) {
+    foreach ($App in $Package) {
+
+        # Get the package path
+        $PackagePath = Get-ChildItem -Path $Package
+
         Write-Host "--"
-        Write-Host "Processing directory: $($App.FullName)" -ForegroundColor "Yellow"
+        Write-Host "Processing directory: $($PackagePath.FullName)" -ForegroundColor "Yellow"
 
         # Import the App.json
-        $AppJson = Get-Content -Path "$($App.FullName)\App.json" -Raw | ConvertFrom-Json
-        Write-Host "Processing app: $($App.FullName)" -ForegroundColor "Cyan"
+        $AppJson = Get-Content -Path "$($PackagePath.FullName)\App.json" -Raw | ConvertFrom-Json
+        Write-Host "Processing app: $($PackagePath.FullName)" -ForegroundColor "Cyan"
 
         # Create a working directory
         $WorkingDir = Join-Path -Path $Path -ChildPath $($AppJson.Application.Name)
@@ -78,8 +74,8 @@ process {
         Remove-Item -Path "$WorkingDir\Invoke-AppDeployToolkit.ps1" -Force
 
         # Copy custom install files
-        Write-Host "Copy $($App.FullName) to: $WorkingDir"
-        & "$Env:SystemRoot\System32\robocopy.exe" "$($App.FullName)" "$($WorkingDir)" /S /NP /NJH /NJS /NFL /NDL
+        Write-Host "Copy $($PackagePath.FullName) to: $WorkingDir"
+        & "$Env:SystemRoot\System32\robocopy.exe" "$($PackagePath.FullName)" "$($WorkingDir)" /S /NP /NJH /NJS /NFL /NDL
 
         Write-Host "Downloading: $($EvergreenApp.URI)"
         $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath "$($WorkingDir)\Files" -ErrorAction "Stop"

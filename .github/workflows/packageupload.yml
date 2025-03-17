@@ -1,4 +1,4 @@
-name: 'Library upload'
+name: 'Package upload'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -6,18 +6,27 @@ env:
 on:
   workflow_dispatch:
     inputs:
-      path:
-        description: Library directory
+      package:
+        description: Package
         required: true
         type: choice
         options:
-          - Library1
-          - Library2
-          - Library3
-  # push:
-  #   branches: ["main"]
-  #   paths:
-  #     - "**/App.json"
+          - Audacity
+          - CitrixWorkspaceAppCurrent
+          - Cyberduck
+          - FoxitReader
+          - GoogleChrome
+          - ImageGlass
+          - MicrosoftPowerToys
+          - MicrosoftSsmsEnu
+          - MicrosoftVisualStudioCode
+          - MicrosoftWvdRemoteDesktop
+          - MozillaFirefox
+          - Notepad++
+          - PaintDotNetOfflineInstaller
+          - ScreenToGif
+          - TrackerSoftwarePDFXChangeEditor
+          - VideoLanVlcPlayer
 
 jobs:
   upload-library:
@@ -33,28 +42,6 @@ jobs:
             modules-to-cache: "Evergreen::, VcRedist::, PSAppDeployToolkit:4.0.6"
             updatable: true
             shell: pwsh
-
-        - name: Import default library
-          id: import-library1
-          if: github.event_name == 'push'
-          shell: pwsh
-          working-directory: ${{ github.workspace }}
-          env:
-            CLIENT_ID: ${{ secrets.CLIENT_ID }}
-            CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-          run: |
-            Import-Module -Name "Evergreen", "VcRedist" -Force
-            New-Item -Path "${{ github.workspace }}\working" -ItemType Directory -Force
-
-            # Authenticate to the Okta API and import the library
-            $params = @{
-                ClientId     = "$env:CLIENT_ID"
-                ClientSecret = "$env:CLIENT_SECRET"
-                Library      = "${{ github.workspace }}\Library1"
-                Path         = "${{ github.workspace }}\working"
-                ErrorAction  = "Stop"
-            }
-            & "${{ github.workspace }}\Start-PackageLibraryUpload.ps1" @params
 
         - name: Import custom library
           id: import-library2
@@ -72,9 +59,9 @@ jobs:
             $params = @{
                 ClientId     = "$env:CLIENT_ID"
                 ClientSecret = "$env:CLIENT_SECRET"
-                Library      = "${{ github.event.inputs.path }}"
+                Package      = "${{ github.workspace }}\Library\${{ github.event.inputs.package }}"
                 Path         = "${{ github.workspace }}\working"
                 ErrorAction  = "Stop"
             }
-            & "${{ github.workspace }}\Start-PackageLibraryUpload.ps1" @params
+            & "${{ github.workspace }}\Start-PackageUpload.ps1" @params
             exit 0

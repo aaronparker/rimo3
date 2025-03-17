@@ -10,26 +10,22 @@
     The path to the library directory containing the application packages. Default value is ".\Library".
 
     .PARAMETER ClientId
-    The client ID for authenticating to the Okta API.
+    The client ID for authenticating to the authentication API.
 
     .PARAMETER ClientSecret
-    The client secret for authenticating to the Okta API.
-
-    .PARAMETER OktaStub
-    The Okta stub for the Okta API URL. Default value is "aus1q1z5zv8Z6Z6QX2p7".
+    The client secret for authenticating to the authentication API.
 
     .PARAMETER Path
     The path where the application packages will be saved.
 
     .EXAMPLE
     Start-PackageLibraryUpload.ps1 -Library "C:\Applications" -ClientId "12345678" -ClientSecret "abcdefg" -Path "C:\Uploads"
-    Uploads application packages from the "C:\Applications" directory to Rimo3 using the specified Okta credentials and saves them to the "C:\Uploads" directory.
+    Uploads application packages from the "C:\Applications" directory to Rimo3 using the specified authentication credentials and saves them to the "C:\Uploads" directory.
 
     .NOTES
     - This script requires PowerShell version 5.1 or later.
     - The "Evergreen" module must be installed before running this script.
-    - Ensure that the Okta credentials provided have the necessary permissions to access the Okta API.
-    - The script will authenticate to the Okta API and retrieve an access token before uploading the application packages.
+    - Ensure that the authentication credentials provided have the necessary permissions to access the authentication API.
     - The script will check the status of the application sequences in Rimo3 before uploading the packages.
     - The script will process each directory in the library and upload the corresponding application package to Rimo3.
     - The script supports both MSI/MSIX and EXE installers.
@@ -43,9 +39,9 @@
 #requires -Modules "Evergreen"
 [CmdletBinding(SupportsShouldProcess = $false)]
 param (
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [System.String] $Library = ".\Library",
+    [System.String[]] $Package,
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
@@ -71,7 +67,7 @@ begin {
     Set-Variable -Name "RimoUploadUri" -Value "$RimoPackagesUri/upload" -Option "Constant"
     Set-Variable -Name "RimoUploadManualUri" -Value "$RimoUploadUri/manual" -Option "Constant"
 
-    # Authenticate to the Okta API
+    # Authenticate to the authentication API
     try {
         $EncodedString = [System.Text.Encoding]::UTF8.GetBytes("${ClientId}:$ClientSecret")
         $Base64String = [System.Convert]::ToBase64String($EncodedString)
@@ -91,7 +87,7 @@ begin {
         Write-Host "Login successful. Token expires in: $($Token.expires_in)"
     }
     catch {
-        Write-Warning -Message "Failed to authenticate to the Okta API. Error: $($_.Exception.Message)"
+        Write-Warning -Message "Failed to authenticate to the authentication API. Error: $($_.Exception.Message)"
         break
     }
 
@@ -111,24 +107,20 @@ begin {
     }
     $Status = Invoke-RestMethod @params
     Write-Host "Found $($Status.Count) existing packages."
-
-    # Import the Evergreen library
-    Write-Host "Importing Evergreen library from: $Library"
-    $LibraryItems = Get-ChildItem -Path $Library -Directory -ErrorAction "Stop"
-
-    # # Install PSAppDeployToolkit module
-    # Write-Host "Installing PSAppDeployToolkit"
-    # Install-Module -Name "PSAppDeployToolkit" -RequiredVersion "4.0.6" -Force
 }
 
 process {
-    foreach ($App in $LibraryItems) {
+    foreach ($App in $Package) {
+        
+        # Get the package path
+        $PackagePath = Get-ChildItem -Path $Package
+
         Write-Host "--"
-        Write-Host "Processing directory: $($App.FullName)" -ForegroundColor "Yellow"
+        Write-Host "Processing directory: $($PackagePath.FullName)" -ForegroundColor "Yellow"
 
         # Import the App.json
-        $AppJson = Get-Content -Path "$($App.FullName)\App.json" -Raw | ConvertFrom-Json
-        Write-Host "Processing app: $($App.FullName)" -ForegroundColor "Cyan"
+        $AppJson = Get-Content -Path "$($PackagePath.FullName)\App.json" -Raw | ConvertFrom-Json
+        Write-Host "Processing app: $($PackagePath.FullName)" -ForegroundColor "Cyan"
 
         # Create a working directory
         $WorkingDir = Join-Path -Path $Path -ChildPath $($AppJson.Application.Name)
@@ -169,12 +161,6 @@ process {
         if ([System.String]::IsNullOrWhiteSpace(($AppStatus.applicationPackageId))) {
             Write-Host "Package not found in Rimo3. Importing: $($AppJson.Information.DisplayName)"
 
-            # # Copy the PSADT files
-            # Write-Host "Copy PSADT files to: $WorkingDir"
-            # Copy-Item -Path "$PsadtSource\*" -Destination $WorkingDir -Recurse -Force
-            # Write-Host "Copy $("$($App.FullName)\Deploy-Application.ps1") to: $("$WorkingDir\Deploy-Application.ps1")"
-            # Copy-Item -Path "$($App.FullName)\Deploy-Application.ps1" -Destination "$WorkingDir\Deploy-Application.ps1"
-
             # Create a PSADT template
             Write-Host "Create PSADT template"
             New-ADTTemplate -Destination "$Env:TEMP\psadt" -Force
@@ -183,8 +169,8 @@ process {
             Remove-Item -Path "$WorkingDir\Invoke-AppDeployToolkit.ps1" -Force
 
             # Copy custom install files
-            Write-Host "Copy $($App.FullName) to: $WorkingDir"
-            & "$Env:SystemRoot\System32\robocopy.exe" "$($App.FullName)" "$($WorkingDir)" /S /NP /NJH /NJS /NFL /NDL
+            Write-Host "Copy $($PackagePath.FullName) to: $WorkingDir"
+            & "$Env:SystemRoot\System32\robocopy.exe" "$($PackagePath.FullName)" "$($WorkingDir)" /S /NP /NJH /NJS /NFL /NDL
 
             Write-Host "Downloading: $($EvergreenApp.URI)"
             $OutFile = $EvergreenApp | Save-EvergreenApp -LiteralPath "$WorkingDir\Files" -ErrorAction "Stop"
@@ -199,12 +185,12 @@ process {
                     Remove-Item -Path $OutFile.FullName -Force
                 }
 
-                # if (Test-Path -Path "$($App.FullName)\Source\Install.json") {
+                # if (Test-Path -Path "$($PackagePath.FullName)\Source\Install.json") {
                 #     # Copy supporting files
                 #     Write-Host "Copy installation wrapper and supporting files"
-                #     Copy-Item -Path "$($App.FullName)\Source\Install.json" -Destination "$WorkingDir\Install.json"
-                #     if (Test-Path -Path "$($App.FullName)\Install.ps1") {
-                #         Copy-Item -Path "$($App.FullName)\Install.ps1" -Destination "$WorkingDir\Install.ps1"
+                #     Copy-Item -Path "$($PackagePath.FullName)\Source\Install.json" -Destination "$WorkingDir\Install.json"
+                #     if (Test-Path -Path "$($PackagePath.FullName)\Install.ps1") {
+                #         Copy-Item -Path "$($PackagePath.FullName)\Install.ps1" -Destination "$WorkingDir\Install.ps1"
                 #     }
                 #     else {
                 #         Copy-Item -Path "$Library\Install.ps1" -Destination "$WorkingDir\Install.ps1"
@@ -212,7 +198,7 @@ process {
 
                 #     # Read the install.json file
                 #     Write-Host "Build install argument list"
-                #     $Install = Get-Content -Path "$($App.FullName)\Source\Install.json" | ConvertFrom-Json
+                #     $Install = Get-Content -Path "$($PackagePath.FullName)\Source\Install.json" | ConvertFrom-Json
                 #     $ArgumentList = $Install.InstallTasks.ArgumentList -replace "#SetupFile", $AppJson.PackageInformation.SetupFile
                 #     $ArgumentList = $ArgumentList -replace "#LogName", $AppJson.PackageInformation.SetupFile
                 #     $ArgumentList = $ArgumentList -replace "#LogPath", "$Env:SystemRoot\Logs"
