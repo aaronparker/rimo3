@@ -43,7 +43,7 @@ jobs:
         run: |
           $params = @{
               Path            = "${{ github.workspace }}"
-              PackageFolder   = @("Library1", "Library2", "Library3")
+              PackageFolder   = @("Library")
               PackageManifest = "App.json"
               InstallManifest = "Install.json"
               Verbose         = $false
