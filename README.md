@@ -6,10 +6,17 @@ Evergreen and Rimo3 Cloud integration proof-of-concept.
 
 ## Update Secrets
 
-Add the required secrets to the repository:
+Add the required secrets to the repository to enable the `Start-PackageUpload.ps1` script to authenticate to the Rimo3 API:
 
 * `CLIENT_ID` - Authentication client ID
 * `CLIENT_SECRET` - secret value to authenticate with the client ID
+
+The following secrets are used by the `update-packagejson` workflow to sign git commits:
+
+* `COMMIT_EMAIL` - Email address used for commits
+* `COMMIT_NAME` - Display name used for commits
+* `GPGKEY` - Signing key for commits
+* `GPGPASSPHRASE` - Passphrase used to unlock the key during commits
 
 ![.img/repo-secrets.jpeg](.img/repo-secrets.jpeg)
 
