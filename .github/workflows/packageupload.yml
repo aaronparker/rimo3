@@ -43,7 +43,7 @@ jobs:
             updatable: true
             shell: pwsh
 
-        - name: Import package
+        - name: 'Import package: ${{ github.event.inputs.package }}'
           id: import-package
           if: github.event_name == 'workflow_dispatch'
           shell: pwsh
