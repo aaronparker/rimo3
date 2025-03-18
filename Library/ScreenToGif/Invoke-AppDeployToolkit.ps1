@@ -134,13 +134,7 @@ function Install-ADTDeployment {
     [System.String] $adtSession.InstallPhase = 'Installation'
 
     # Install the application
-    $params = @{
-        FilePath     = $Global:Installer.FullName
-        ArgumentList = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- /MERGETASKS="!desktopicon"'
-        PassThru     = $true
-    }
-    Start-ADTProcess @params
-
+    Add-AppxPackage -Path $Global:Installer.FullName -Verbose
 
     ##*===============================================
     ##* POST-INSTALLATION
@@ -164,7 +158,7 @@ function Uninstall-ADTDeployment {
     ##*==============================================================================================
     [System.String] $adtSession.InstallPhase = 'Uninstallation'
 
-    Start-ADTProcess -FilePath "$Env:ProgramFiles\Notepad++\uninstall.exe" -ArgumentList '/S'
+    Get-AppxPackage -Name "33823Nicke.ScreenToGif" | Remove-AppxPackage -AllUsers
 
     ##*===============================================
     ##* POST-UNINSTALLATION
