@@ -26,7 +26,7 @@
   "Program": {
     "InstallTemplate": "Invoke-AppDeployToolkit.exe -DeploymentType Install -DeployMode Silent",
     "InstallCommand": "Invoke-AppDeployToolkit.exe -DeploymentType Install -DeployMode Silent",
-    "UninstallCommand": "\"C:\\Program Files\\Audacity\\unins000.exe\" /VERYSILENT",
+    "UninstallCommand": "Invoke-AppDeployToolkit.exe -DeploymentType Uninstall -DeployMode Silent",
     "InstallExperience": "system",
     "DeviceRestartBehavior": "basedOnReturnCode",
     "AllowAvailableUninstall": false
