@@ -61,11 +61,11 @@ begin {
     Import-Module -Name "Evergreen", "VcRedist", "PSAppDeployToolkit" -Force
 
     # Define constants
-    Set-Variable -Name "Rimo3TokenUri" -Value "https://rimo3cloud.com/api/v2/connect/token" -Option "Constant"
+    Set-Variable -Name "Rimo3TokenUrl" -Value "https://rimo3cloud.com/api/v2/connect/token" -Option "Constant"
     Set-Variable -Name "Rimo3BaseUrl" -Value "https://rimo3cloud.com" -Option "Constant"
-    Set-Variable -Name "RimoPackagesUri" -Value "$Rimo3BaseUrl/api/v2/application-packages" -Option "Constant"
-    Set-Variable -Name "RimoUploadUri" -Value "$RimoPackagesUri/upload" -Option "Constant"
-    Set-Variable -Name "RimoUploadManualUri" -Value "$RimoUploadUri/manual" -Option "Constant"
+    Set-Variable -Name "Rimo3PackagesUrl" -Value "$Rimo3BaseUrl/api/v2/application-packages" -Option "Constant"
+    Set-Variable -Name "Rimo3UploadUrl" -Value "$Rimo3PackagesUrl/upload" -Option "Constant"
+    Set-Variable -Name "Rimo3UploadManualUrl" -Value "$Rimo3UploadUrl/manual" -Option "Constant"
 
     # Authenticate to the authentication API
     try {
@@ -73,7 +73,7 @@ begin {
         $Base64String = [System.Convert]::ToBase64String($EncodedString)
 
         $params = @{
-            Uri             = $Rimo3TokenUri
+            Uri             = $Rimo3TokenUrl
             Body            = "{`"Form-Data`": `"grant_type=client_credentials`"}"
             Headers         = @{
                 "Authorization" = "Basic $Base64String"
@@ -94,7 +94,7 @@ begin {
     # Get the status of the application sequences
     Write-Host "Getting application sequences status from Rimo3"
     $params = @{
-        Uri             = $RimoPackagesUri
+        Uri             = $Rimo3PackagesUrl
         Headers         = @{
             "Accept"        = "application/json; utf-8"
             "Authorization" = "Bearer $($Token.access_token)"
@@ -227,7 +227,7 @@ process {
 
                 try {
                     $params = @{
-                        Uri             = $RimoUploadManualUri
+                        Uri             = $Rimo3UploadManualUrl
                         Method          = "POST"
                         Headers         = @{
                             "accept"        = "application/json"
