@@ -188,27 +188,6 @@ process {
                 # Remove duplicate PSADT files
                 Remove-Item -Path "$WorkingDir\PSAppDeployToolkit\Frontend\v4\Invoke-AppDeployToolkit.exe" -ErrorAction "SilentlyContinue"
 
-                # if (Test-Path -Path "$($PackagePath.FullName)\Source\Install.json") {
-                #     # Copy supporting files
-                #     Write-Host "Copy installation wrapper and supporting files"
-                #     Copy-Item -Path "$($PackagePath.FullName)\Source\Install.json" -Destination "$WorkingDir\Install.json"
-                #     if (Test-Path -Path "$($PackagePath.FullName)\Install.ps1") {
-                #         Copy-Item -Path "$($PackagePath.FullName)\Install.ps1" -Destination "$WorkingDir\Install.ps1"
-                #     }
-                #     else {
-                #         Copy-Item -Path "$Library\Install.ps1" -Destination "$WorkingDir\Install.ps1"
-                #     }
-
-                #     # Read the install.json file
-                #     Write-Host "Build install argument list"
-                #     $Install = Get-Content -Path "$($PackagePath.FullName)\Source\Install.json" | ConvertFrom-Json
-                #     $ArgumentList = $Install.InstallTasks.ArgumentList -replace "#SetupFile", $AppJson.PackageInformation.SetupFile
-                #     $ArgumentList = $ArgumentList -replace "#LogName", $AppJson.PackageInformation.SetupFile
-                #     $ArgumentList = $ArgumentList -replace "#LogPath", "$Env:SystemRoot\Logs"
-                #     Write-Host "Setup file: $($AppJson.PackageInformation.SetupFile)"
-                #     Write-Host "Argument list: $ArgumentList"
-                # }
-
                 # Compress the downloaded installers and supporting files
                 Write-Host "Compress zip: $(Join-Path -Path $WorkingDir -ChildPath "$($AppJson.Application.Name).zip")"
                 $params = @{
