@@ -15,11 +15,7 @@ param (
 
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [System.String] $ClientSecret,
-
-    [Parameter(Mandatory = $false)]
-    [ValidateNotNullOrEmpty()]
-    [System.String] $OktaStub = "aus1q1z5zv8Z6Z6QX2p7"
+    [System.String] $ClientSecret
 )
 
 begin {
@@ -27,33 +23,40 @@ begin {
     Import-Module -Name "Evergreen" -Force
 
     # Define constants
-    Set-Variable -Name "Rimo3Url" -Value "https://rimo3cloud.com" -Option "Constant"
-    Set-Variable -Name "RimoPackagesUri" -Value "$Rimo3Url/api/v2/application-packages" -Option "Constant"
+    Set-Variable -Name "Rimo3TokenUrl" -Value "https://rimo3cloud.com/api/v2/connect/token" -Option "Constant"
+    Set-Variable -Name "Rimo3BaseUrl" -Value "https://rimo3cloud.com" -Option "Constant"
+    Set-Variable -Name "Rimo3PackagesUrl" -Value "$Rimo3BaseUrl/api/v2/application-packages" -Option "Constant"
+    Set-Variable -Name "Rimo3UploadUrl" -Value "$Rimo3PackagesUrl/upload" -Option "Constant"
+    Set-Variable -Name "Rimo3UploadManualUrl" -Value "$Rimo3UploadUrl/manual" -Option "Constant"
 
-    # Authenticate to the Okta API
-    $params = @{
-        Uri             = "https://rimo3.okta.com/oauth2/$OktaStub/v1/token"
-        Body            = @{
-            "grant_type"  = "client_credentials"
-            scope         = "access_token"
-            client_id     = $ClientId
-            client_secret = $ClientSecret
+    # Authenticate to the authentication API
+    try {
+        $EncodedString = [System.Text.Encoding]::UTF8.GetBytes("${ClientId}:$ClientSecret")
+        $Base64String = [System.Convert]::ToBase64String($EncodedString)
+
+        $params = @{
+            Uri             = $Rimo3TokenUrl
+            Body            = "{`"Form-Data`": `"grant_type=client_credentials`"}"
+            Headers         = @{
+                "Authorization" = "Basic $Base64String"
+                "Cache-Control" = "no-cache"
+            }
+            Method          = "POST"
+            UseBasicParsing = $true
+            ErrorAction     = "Stop"
         }
-        Headers         = @{
-            "Accept"        = "application/json; utf-8"
-            "Content-Type"  = "application/x-www-form-urlencoded"
-            "Cache-Control" = "no-cache"
-        }
-        Method          = "POST"
-        UseBasicParsing = $true
-        ErrorAction     = "Stop"
+        $Token = Invoke-RestMethod @params
+        Write-Host "Login successful. Token expires in: $($Token.expires_in)"
     }
-    $Token = Invoke-RestMethod @params
+    catch {
+        Write-Warning -Message "Failed to authenticate to the authentication API. Error: $($_.Exception.Message)"
+        break
+    }
 
     # Get the status of the application sequences
     Write-Host "Getting application sequence status"
     $params = @{
-        Uri             = $RimoPackagesUri
+        Uri             = $Rimo3PackagesUrl
         Headers         = @{
             "Accept"        = "application/json; utf-8"
             "Authorization" = "Bearer $($Token.access_token)"
@@ -94,7 +97,7 @@ process {
         }
         else {
             $params = @{
-                Uri             = "$RimoPackagesUri/$($AppStatus.applicationPackageId)/sequences"
+                Uri             = "$Rimo3PackagesUrl/$($AppStatus.applicationPackageId)/sequences"
                 Headers         = @{
                     "Accept"        = "application/json; utf-8"
                     "Authorization" = "Bearer $($Token.access_token)"
