@@ -135,11 +135,12 @@ function Install-ADTDeployment {
 
     # Install the application
     $params = @{
+        Action       = 'Install'
         FilePath     = $Global:Installer.FullName
         ArgumentList = "DESKTOP_SHORTCUT=false TASKBAR_SHORTCUT=false /quiet"
         PassThru     = $true
     }
-    Start-ADTProcess @params
+    Start-ADTMsiProcess @params
 
 
     ##*===============================================
