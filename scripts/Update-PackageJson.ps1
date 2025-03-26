@@ -12,13 +12,10 @@ param (
     [System.String] $Path = $PWD,
 
     [Parameter()]
-    [System.String[]] $PackageFolder = @("Library1", "Library2", "Library3"),
+    [System.String[]] $PackageFolder = @("Library"),
 
     [Parameter()]
-    [System.String] $PackageManifest = "App.json",
-
-    [Parameter()]
-    [System.String] $InstallManifest = "Install.json"
+    [System.String] $PackageManifest = "App.json"
 )
 
 try {
@@ -158,68 +155,6 @@ foreach ($ManifestJson in $ManifestList) {
             }
             else {
                 Write-Host -ForegroundColor "Cyan" "Could not compare package version."
-            }
-            #endregion
-
-
-            #region Get the application install manifest and update it
-            $InstallConfiguration = $([System.IO.Path]::Combine($ManifestJson.Directory, $Manifest.PackageInformation.SourceFolder, $InstallManifest))
-            Write-Host -ForegroundColor "Cyan" "Read: $InstallConfiguration."
-            if (Test-Path -Path $InstallConfiguration) {
-                try {
-                    $InstallData = Get-Content -Path $InstallConfiguration -ErrorAction "SilentlyContinue" | ConvertFrom-Json -Depth 20 -ErrorAction "SilentlyContinue"
-                }
-                catch {
-                    throw $_
-                }
-
-                # If the version that Evergreen returns is higher than the version in the manifest
-                if ([System.Version]$AppUpdate.Version -eq [System.Version]$InstallData.PackageInformation.Version) {
-                    Write-Host -ForegroundColor "Cyan" "Update version: $($AppUpdate.Version) matches install script version: $($Manifest.PackageInformation.Version)."
-                }
-                elseif ([System.Version]$AppUpdate.Version -gt [System.Version]$InstallData.PackageInformation.Version -or [System.String]::IsNullOrEmpty($InstallData.PackageInformation.Version)) {
-
-                    # Update the manifest with the application setup file
-                    Write-Host -ForegroundColor "Cyan" "Update install script: $InstallConfiguration"
-                    $InstallData.PackageInformation.Version = $AppUpdate.Version
-
-                    if ([System.Boolean]($AppUpdate.PSobject.Properties.Name -match "URI")) {
-                        if ($AppUpdate.URI -match "\.zip$") {
-                            if (Test-Path -Path Env:Temp -ErrorAction "SilentlyContinue") { $ZipPath = $Env:Temp } else { $ZipPath = $HOME }
-                            $Download = $AppUpdate | Save-EvergreenApp -CustomPath $ZipPath
-                            [Reflection.Assembly]::LoadWithPartialName('System.IO.Compression.FileSystem')
-                            $SetupFile = [IO.Compression.ZipFile]::OpenRead($Download.FullName).Entries.FullName
-                            $InstallData.PackageInformation.SetupFile = $SetupFile -replace "%20", " "
-                        }
-                        else {
-                            if ([System.Boolean]($AppUpdate.PSobject.Properties.name -match "Filename")) {
-                                $InstallData.PackageInformation.SetupFile = $AppUpdate.Filename -replace "%20", " "
-                            }
-                            else {
-                                $InstallData.PackageInformation.SetupFile = $(Split-Path -Path $AppUpdate.URI -Leaf) -replace "%20", " "
-                            }
-                        }
-                    }
-                    else {
-                        $InstallData.PackageInformation.SetupFile = $(Split-Path -Path $AppUpdate.Download -Leaf) -replace "%20", " "
-                    }
-
-                    # Write the application install manifest back to disk
-                    Write-Host -ForegroundColor "Cyan" "Output: $InstallConfiguration."
-                    $InstallData | ConvertTo-Json -Depth 20 | Out-File -FilePath $InstallConfiguration -Force
-                }
-                elseif ([System.Version]$AppUpdate.Version -lt [System.Version]$InstallData.PackageInformation.Version) {
-                    Write-Host -ForegroundColor "Cyan" "Update version: $($AppUpdate.Version) less than install script version: $($InstallData.PackageInformation.Version)."
-                }
-                else {
-                    Write-Host -ForegroundColor "Cyan" "Could not compare install script version."
-                }
-
-                # Remove the zip file if it exists
-                if (Test-Path -Path $Download.FullName -ErrorAction "SilentlyContinue") { Remove-Item -Path $Download.FullName -Force -ErrorAction "SilentlyContinue" }
-            }
-            else {
-                Write-Warning -Message "Cannot find: $InstallConfiguration."
             }
             #endregion
         }
