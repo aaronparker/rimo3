@@ -1,5 +1,5 @@
 # Update package App.json
-name: 'Update Package App.json'
+name: 'Update package App.json'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
