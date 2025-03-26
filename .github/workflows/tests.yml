@@ -1,4 +1,4 @@
-name: 'Validate apps'
+name: 'Validate app packages'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

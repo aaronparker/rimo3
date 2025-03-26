@@ -1,5 +1,5 @@
 # Update package App.json
-name: Update Package Manifests
+name: 'Update Package App.json'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -45,7 +45,6 @@ jobs:
               Path            = "${{ github.workspace }}"
               PackageFolder   = @("Library")
               PackageManifest = "App.json"
-              InstallManifest = "Install.json"
               Verbose         = $false
           }
           . "${{ github.workspace }}/scripts/Update-PackageJson.ps1" @params
