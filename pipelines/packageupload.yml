@@ -1,0 +1,99 @@
+# Upload a package to Rimo3 Cloud
+
+trigger:
+- none
+
+variables:
+- group: 'Secrets'
+
+# Input parameters
+parameters:
+- name: package
+  displayName: 'Select package:'
+  type: string
+  default: 'Audacity'
+  values:
+    - Audacity
+    - CitrixWorkspaceAppCurrent
+    - Cyberduck
+    - FoxitReader
+    - GoogleChrome
+    - ImageGlass
+    - MicrosoftPowerToys
+    - MicrosoftSsmsEnu
+    - MicrosoftVisualStudioCode
+    - MicrosoftWvdRemoteDesktop
+    - MozillaFirefox
+    - Notepad++
+    - PaintDotNetOfflineInstaller
+    - ScreenToGif
+    - TrackerSoftwarePDFXChangeEditor
+    - VideoLanVlcPlayer
+
+jobs:
+- job: upload
+  displayName: 'Package and import: ${{ parameters.package }}'
+  pool:
+    vmImage: 'windows-latest'
+  timeoutInMinutes: 360
+  cancelTimeoutInMinutes: 5
+  steps:
+
+  # Checkout this repository
+  - checkout: self
+    persistCredentials: true # Allow scripts to access the system token
+
+  # Install the required PowerShell modules
+  - task: PowerShell@2
+    displayName: 'Install modules'
+    inputs:
+      targetType: 'inline'
+      pwsh: true
+      errorActionPreference: 'stop'
+      verbosePreference: 'silentlyContinue'
+      progressPreference: 'silentlyContinue'
+      script:
+        Install-Module -Name "Evergreen", "VcRedist", "PSAppDeployToolkit" -Force -Scope CurrentUser -AllowClobber
+
+  - task: PowerShell@2
+    displayName: 'Update manifests'
+    inputs:
+      targetType: 'inline'
+      pwsh: true
+      errorActionPreference: 'stop'
+      verbosePreference: 'silentlyContinue'
+      progressPreference: 'silentlyContinue'
+      script: |
+          $params = @{
+              Path            = "$(Build.SourcesDirectory)"
+              PackageFolder   = @("Library")
+              PackageManifest = "App.json"
+              Verbose         = $false
+          }
+          . "$(Build.SourcesDirectory)/scripts/Update-PackageJson.ps1" @params
+
+  - task: PowerShell@2
+    displayName: 'Upload ${{ parameters.package }}'
+    inputs:
+      targetType: 'inline'
+      pwsh: true
+      errorActionPreference: 'stop'
+      verbosePreference: 'silentlyContinue'
+      progressPreference: 'silentlyContinue'
+      script: |
+          Import-Module -Name "Evergreen", "VcRedist", "PSAppDeployToolkit" -Force
+          New-Item -Path "$(Build.SourcesDirectory)\working" -ItemType Directory -Force
+
+          Write-Host "Processing: $(Build.SourcesDirectory)\Library\${{ parameters.package }}"
+          $params = @{
+              ClientId     = "$env:CLIENT_ID"
+              ClientSecret = "$env:CLIENT_SECRET"
+              Package      = "$(Build.SourcesDirectory)\Library\${{ parameters.package }}"
+              Path         = "$(Build.SourcesDirectory)\working"
+              ErrorAction  = "Stop"
+          }
+          & "$(Build.SourcesDirectory)\Start-PackageUpload.ps1" @params
+          exit 0
+    env:
+      CLIENT_ID: $(CLIENT_ID)
+      CLIENT_SECRET: $(CLIENT_SECRET)
