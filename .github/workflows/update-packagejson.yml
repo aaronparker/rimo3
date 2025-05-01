@@ -24,7 +24,7 @@ jobs:
         id: psmodulecache
         uses: potatoqualitee/psmodulecache@v6.2.1
         with:
-          modules-to-cache: "Evergreen::, VcRedist::, PSAppDeployToolkit:4.0.6"
+          modules-to-cache: "Evergreen::, PSAppDeployToolkit:4.0.6"
           updatable: true
           shell: pwsh
 
@@ -32,7 +32,7 @@ jobs:
         id: list-modules
         shell: pwsh
         run: |
-          foreach ($module in @("Evergreen", "VcRedist")) {
+          foreach ($module in @("Evergreen")) {
               $Version = (Get-Module -Name $module -ListAvailable | Select-Object -First 1).Version.ToString()
               Write-Host "$module version: $Version"
           }

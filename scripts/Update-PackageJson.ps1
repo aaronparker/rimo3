@@ -1,4 +1,4 @@
-#Requires -Modules Evergreen, VcRedist
+#Requires -Modules Evergreen
 #Requires -Version 6.0
 <#
     Update the App.json for packages
@@ -44,7 +44,7 @@ foreach ($ManifestJson in $ManifestList) {
         Write-Host -ForegroundColor "Cyan" "Not supported for automatic update: $($ManifestJson.FullName)."
     }
     else {
-        # Determine the application download and version number via Evergreen or VcRedist
+        # Determine the application download and version number via Evergreen
         # Get the details of the application
         Write-Host -ForegroundColor "Cyan" "Application: $($Manifest.Application.Title)"
         Write-Host -ForegroundColor "Cyan" "Running: $($Manifest.Application.Filter)."

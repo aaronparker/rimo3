@@ -1,4 +1,4 @@
-#Requires -Modules Evergreen, VcRedist, PSAppDeployToolkit
+#Requires -Modules Evergreen, PSAppDeployToolkit
 <#
 .SYNOPSIS
     This script is used to create a new local package using the Evergreen library and the PSAppDeployToolkit.
@@ -19,7 +19,7 @@
 
 .NOTES
     - This script requires PowerShell version 5.1 or later.
-    - The "Evergreen" and "VcRedist" modules must be installed.
+    - The "Evergreen" module must be installed.
     - The Evergreen library must be present in the specified library directory.
     - The PSAppDeployToolkit will be downloaded and extracted to the specified path.
     - The App.json file must be present in each directory in the library.
@@ -40,7 +40,7 @@ param (
 
 begin {
     # Import the required modules
-    Import-Module -Name "Evergreen", "VcRedist" -Force
+    Import-Module -Name "Evergreen" -Force
 }
 
 process {

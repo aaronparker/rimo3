@@ -39,7 +39,7 @@ jobs:
           id: psmodulecache
           uses: potatoqualitee/psmodulecache@v6.2.1
           with:
-            modules-to-cache: "Evergreen::, VcRedist::, PSAppDeployToolkit:4.0.6"
+            modules-to-cache: "Evergreen::, PSAppDeployToolkit:4.0.6"
             updatable: true
             shell: pwsh
 
@@ -52,7 +52,7 @@ jobs:
             CLIENT_ID: ${{ secrets.CLIENT_ID }}
             CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
           run: |
-            Import-Module -Name "Evergreen", "VcRedist" -Force
+            Import-Module -Name "Evergreen" -Force
             New-Item -Path "${{ github.workspace }}\working" -ItemType Directory -Force
 
             # Authenticate to the API and import the library
