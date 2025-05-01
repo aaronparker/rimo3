@@ -1,42 +1,39 @@
-#Requires -Modules Evergreen, VcRedist, PSAppDeployToolkit
 <#
     .SYNOPSIS
-    Uploads application packages to Rimo3 Cloud.
+    Automates the process of uploading application packages to the Rimo3 Cloud platform.
 
     .DESCRIPTION
-    This script uploads application packages to Rimo3, a cloud-based application management platform. It requires the "Evergreen" module to be installed.
+    This script is designed to streamline the process of uploading application packages to the Rimo3 Cloud platform. 
+    It authenticates with the Rimo3 API, retrieves the status of existing application packages, and processes new packages 
+    by creating working directories, downloading application installers using Evergreen, and uploading the packages to Rimo3.
 
-    .PARAMETER Library
-    The path to the library directory containing the application packages. Default value is ".\Library".
+    .PARAMETER Package
+    An array of paths to the application package directories to be processed. Each directory must contain an `App.json` file 
+    with metadata about the application.
 
     .PARAMETER ClientId
-    The client ID for authenticating to the authentication API.
+    The client ID used for authentication with the Rimo3 API.
 
     .PARAMETER ClientSecret
-    The client secret for authenticating to the authentication API.
+    The client secret used for authentication with the Rimo3 API.
 
     .PARAMETER Path
-    The path where the application packages will be saved.
+    The base path where working directories for processing application packages will be created.
 
     .EXAMPLE
-    Start-PackageLibraryUpload.ps1 -Library "C:\Applications" -ClientId "12345678" -ClientSecret "abcdefg" -Path "C:\Uploads"
-    Uploads application packages from the "C:\Applications" directory to Rimo3 using the specified authentication credentials and saves them to the "C:\Uploads" directory.
+    .\Start-PackageUpload.ps1 -Package "C:\Packages\App1", "C:\Packages\App2" -ClientId "my-client-id" -ClientSecret "my-client-secret" -Path "C:\WorkingDir"
+
+    This example processes two application packages located at `C:\Packages\App1` and `C:\Packages\App2`, authenticates with 
+    the Rimo3 API using the provided client ID and secret, and creates working directories under `C:\WorkingDir`.
 
     .NOTES
-    - This script requires PowerShell version 5.1 or later.
-    - The "Evergreen" module must be installed before running this script.
-    - Ensure that the authentication credentials provided have the necessary permissions to access the authentication API.
-    - The script will check the status of the application sequences in Rimo3 before uploading the packages.
-    - The script will process each directory in the library and upload the corresponding application package to Rimo3.
-    - The script supports both MSI/MSIX and EXE installers.
-    - For MSI/MSIX installers, the script will compress the downloaded installer and upload it to Rimo3.
-    - For EXE installers, the script will compress the downloaded installer and supporting files (Install.json and Install.ps1) and upload them to Rimo3.
-    - The script will use the Evergreen module to download the application packages based on the filter specified in the App.json file.
-    - If an application package with the same version and setup file name already exists in Rimo3, it will not be re-uploaded.
-    - The script will display the progress and status of the upload process.
+    - Requires PowerShell 5.1 or later.
+    - Requires the `Evergreen` and `PSAppDeployToolkit` modules.
+    - The script uses the Rimo3 API for authentication and package management.
+    - Ensure that the `App.json` file in each package directory contains valid metadata for the application.
 #>
-#requires -Version 5.1
-#requires -Modules "Evergreen"
+#Requires -Version 5.1
+#Requires -Modules Evergreen, PSAppDeployToolkit
 [CmdletBinding(SupportsShouldProcess = $false)]
 param (
     [Parameter(Mandatory = $true)]
@@ -58,7 +55,7 @@ param (
 
 begin {
     # Import the required modules
-    Import-Module -Name "Evergreen", "VcRedist", "PSAppDeployToolkit" -Force
+    Import-Module -Name "Evergreen", "PSAppDeployToolkit" -Force
 
     # Define constants
     Set-Variable -Name "Rimo3TokenUrl" -Value "https://rimo3cloud.com/api/v2/connect/token" -Option "Constant"
