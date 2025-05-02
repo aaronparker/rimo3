@@ -1,6 +1,6 @@
 # Rimo3
 
-Evergreen and Rimo3 Cloud integration proof-of-concept.
+Evergreen and Rimo3 Cloud integration solution.
 
 [![Validate apps](https://github.com/aaronparker/rimo3/actions/workflows/tests.yml/badge.svg)](https://github.com/aaronparker/rimo3/actions/workflows/tests.yml)
 
