@@ -1,7 +1,7 @@
 {
   "Application": {
     "Name": "ScreenToGif",
-    "Filter": "Get-EvergreenAppFromApi -Name \"ScreenToGif\" | Where-Object { $_.Architecture -eq \"x64\" -and $_.Type -eq \"msix\" } | Select-Object -First 1",
+    "Filter": "Get-EvergreenApp -Name \"ScreenToGif\" | Where-Object { $_.Architecture -eq \"x64\" -and $_.Type -eq \"msix\" } | Select-Object -First 1",
     "Title": "ScreenToGif",
     "Language": "en-US",
     "Architecture": "x64"

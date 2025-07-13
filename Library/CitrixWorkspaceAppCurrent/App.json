@@ -1,7 +1,7 @@
 {
   "Application": {
     "Name": "CitrixWorkspaceApp",
-    "Filter": "Get-EvergreenAppFromApi -Name \"CitrixWorkspaceApp\" | Where-Object { $_.Stream -eq \"Current\" } | Select-Object -First 1",
+    "Filter": "Get-EvergreenApp -Name \"CitrixWorkspaceApp\" | Where-Object { $_.Stream -eq \"Current\" } | Select-Object -First 1",
     "Title": "Citrix Workspace app Current Release",
     "Language": "en-US",
     "Architecture": "x86"
