@@ -8,14 +8,14 @@
   },
   "PackageInformation": {
     "SetupType": "MSIX",
-    "SetupFile": "ScreenToGif.2.41.3.Package.x64.msix",
-    "Version": "2.41.3",
+    "SetupFile": "ScreenToGif.2.41.4.Package.x64.msix",
+    "Version": "2.41.4",
     "SourceFolder": "Source",
     "OutputFolder": "Package",
     "IconFile": "https://github.com/aaronparker/icons/raw/main/companyportal/Audacity.png"
   },
   "Information": {
-    "DisplayName": "ScreenToGif 2.41.3 x64",
+    "DisplayName": "ScreenToGif 2.41.4 x64",
     "Description": "Screen, webcam and sketch board recorder with an integrated editor.",
     "Publisher": "Nicke Manarin",
     "InformationURL": "https://www.screentogif.com/",
