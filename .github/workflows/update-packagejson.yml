@@ -11,7 +11,7 @@ on:
     paths:
       - "scripts/Update-PackageJson.ps1"
   schedule:
-      - cron: '15 3 * * *'
+      - cron: '15 15 * * 6'
 
 jobs:
   update-json:
